@@ -1,5 +1,5 @@
-## spark-on-k8s-doc
-Repo to host documentation site for Apache Spark on Kubernetes
+## userdocs
+Repo to host user documentation site for Apache Spark on Kubernetes
 
 ### Documentation build instructions
 
@@ -11,7 +11,7 @@ $ gem install jekyll
 
 #### Preview
 ```bash
-$ cd /path/to/spark-on-k8s-doc
+$ cd /path/to/userdocs
 # I find xsbt to be more reliable than sbt
 $ xsbt previewSite
 ```
@@ -24,7 +24,7 @@ $ xsbt ghpagesPushSite
 ```
 View the user documentation for Apache Spark on Kubernetes here:
 
-https://apache-spark-on-k8s.github.io/spark-on-k8s-doc/
+https://apache-spark-on-k8s.github.io/userdocs/
 
 #### New Content
 The markdown files for this site live here:
