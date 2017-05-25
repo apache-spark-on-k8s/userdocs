@@ -20,7 +20,7 @@ This will put the home page up on your brower so you can view a draft of the sit
 #### Deploy
 Deploy the latest version of site content to GH pages:
 ```bash
-$ sbt ghpagesPushSite
+$ xsbt ghpagesPushSite
 ```
 View the user documentation for Apache Spark on Kubernetes here:
 
