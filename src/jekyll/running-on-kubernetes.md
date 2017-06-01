@@ -591,5 +591,3 @@ from the other deployment modes. See the [configuration page](configuration.html
   </td>
 </tr>
 </table>
-
-### Using the Spark UI and dashboard
