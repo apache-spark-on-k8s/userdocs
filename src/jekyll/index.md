@@ -17,5 +17,4 @@ This is a collaboratively maintained project working on [SPARK-18278](https://is
 ### Contents
 
 * [Running Spark on Kubernetes](./running-on-kubernetes.html)
-* [FAQ](./FAQ.html)
 * [Contribute](./contribute.html)
