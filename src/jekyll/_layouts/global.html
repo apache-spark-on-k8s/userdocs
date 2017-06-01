@@ -49,59 +49,6 @@
                     <ul class="nav">
                         <!--TODO(andyk): Add class="active" attribute to li some how.-->
                         <li><a href="index.html">Overview</a></li>
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Programming Guides<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="quick-start.html">Quick Start</a></li>
-                                <li><a href="programming-guide.html">Spark Programming Guide</a></li>
-                                <li class="divider"></li>
-                                <li><a href="streaming-programming-guide.html">Spark Streaming</a></li>
-                                <li><a href="sql-programming-guide.html">DataFrames, Datasets and SQL</a></li>
-                                <li><a href="structured-streaming-programming-guide.html">Structured Streaming</a></li>
-                                <li><a href="ml-guide.html">MLlib (Machine Learning)</a></li>
-                                <li><a href="graphx-programming-guide.html">GraphX (Graph Processing)</a></li>
-                                <li><a href="sparkr.html">SparkR (R on Spark)</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">API Docs<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="api/scala/index.html#org.apache.spark.package">Scala</a></li>
-                                <li><a href="api/java/index.html">Java</a></li>
-                                <li><a href="api/python/index.html">Python</a></li>
-                                <li><a href="api/R/index.html">R</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Deploying<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="cluster-overview.html">Overview</a></li>
-                                <li><a href="submitting-applications.html">Submitting Applications</a></li>
-                                <li class="divider"></li>
-                                <li><a href="spark-standalone.html">Spark Standalone</a></li>
-                                <li><a href="running-on-mesos.html">Mesos</a></li>
-                                <li><a href="running-on-yarn.html">YARN</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="dropdown">
-                            <a href="api.html" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="configuration.html">Configuration</a></li>
-                                <li><a href="monitoring.html">Monitoring</a></li>
-                                <li><a href="tuning.html">Tuning Guide</a></li>
-                                <li><a href="job-scheduling.html">Job Scheduling</a></li>
-                                <li><a href="security.html">Security</a></li>
-                                <li><a href="hardware-provisioning.html">Hardware Provisioning</a></li>
-                                <li class="divider"></li>
-                                <li><a href="building-spark.html">Building Spark</a></li>
-                                <li><a href="http://spark.apache.org/contributing.html">Contributing to Spark</a></li>
-                                <li><a href="http://spark.apache.org/third-party-projects.html">Third Party Projects</a></li>
-                            </ul>
-                        </li>
                     </ul>
                     <!--<p class="navbar-text pull-right"><span class="version-text">v{{site.SPARK_VERSION_SHORT}}</span></p>-->
                 </div>
@@ -131,9 +78,7 @@
                     {% else %}
                         <h1 class="title">{{ page.title }}</h1>
                     {% endif %}
-
-                    {{ content }}
-
+                    {{ content | toc }}
                 </div>
             {% endif %}
              <!-- /container -->
