@@ -22,4 +22,5 @@ in a fully supported way on par with the Spark Standalone, Mesos, and Apache YAR
 ### Contents
 
 * [Running Spark on Kubernetes](./running-on-kubernetes.html)
+* [Running Spark in Cloud Environments](./running-on-kubernetes-cloud.html)
 * [Contribute](./contribute.html)
