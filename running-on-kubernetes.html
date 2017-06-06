@@ -57,23 +57,10 @@
                     
                         <h1 class="title">Running Spark on Kubernetes</h1>
                     
-                    <ul class="section-nav">
-<li class="toc-entry toc-h2"><a href="#prerequisites">Prerequisites</a></li>
-<li class="toc-entry toc-h2"><a href="#current-limitations">Current Limitations</a></li>
-<li class="toc-entry toc-h2"><a href="#driver--executor-images">Driver & Executor Images</a></li>
-<li class="toc-entry toc-h2"><a href="#submitting-applications-to-kubernetes">Submitting Applications to Kubernetes</a></li>
-<li class="toc-entry toc-h2"><a href="#dependency-management">Dependency Management</a></li>
-<li class="toc-entry toc-h3"><a href="#dependency-management-without-the-resource-staging-server">Dependency Management Without The Resource Staging Server</a></li>
-<li class="toc-entry toc-h3"><a href="#accessing-kubernetes-clusters">Accessing Kubernetes Clusters</a></li>
-<li class="toc-entry toc-h2"><a href="#dynamic-executor-scaling">Dynamic Executor Scaling</a></li>
-<li class="toc-entry toc-h2"><a href="#advanced">Advanced</a></li>
-<li class="toc-entry toc-h3"><a href="#securing-the-resource-staging-server-with-tls">Securing the Resource Staging Server with TLS</a></li>
-<li class="toc-entry toc-h3"><a href="#spark-properties">Spark Properties</a></li>
-</ul><p>Support for running on <a href="https://kubernetes.io/docs/whatisk8s/">Kubernetes</a> is available in experimental status. The
+                    <p>Support for running on <a href="https://kubernetes.io/docs/whatisk8s/">Kubernetes</a> is available in experimental status. The
 feature set is currently limited and not well-tested. This should not be used in production environments.</p>
 
-<h2 id="prerequisites">
-<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h2>
+<h2 id="prerequisites">Prerequisites</h2>
 
 <ul>
   <li>You must have a running Kubernetes cluster with access configured to it
@@ -95,18 +82,7 @@ should give you a list of pods and configmaps (if any) respectively.</li>
 <a href="../resource-managers/kubernetes/README.md#building-spark-with-kubernetes-support">building Spark with Kubernetes support</a>.</li>
 </ul>
 
-<h2 id="current-limitations">
-<a id="current-limitations" class="anchor" href="#current-limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Current Limitations</h2>
-
-<p>Running Spark on Kubernetes is currently an experimental feature. Some restrictions on the current implementation that
-should be lifted in the future include:</p>
-<ul>
-  <li>Applications can only run in cluster mode.</li>
-  <li>Only Scala and Java applications can be run.</li>
-</ul>
-
-<h2 id="driver--executor-images">
-<a id="driver--executor-images" class="anchor" href="#driver--executor-images" aria-hidden="true"><span class="octicon octicon-link"></span></a>Driver &amp; Executor Images</h2>
+<h2 id="driver--executor-images">Driver &amp; Executor Images</h2>
 
 <p>Kubernetes requires users to supply images that can be deployed into containers within pods. The images are built to
 be run in a container runtime environment that Kubernetes supports. Docker is a container runtime environment that is
@@ -116,21 +92,18 @@ frequently used with Kubernetes, so Spark provides some support for working with
 <a href="https://hub.docker.com/u/kubespark/">kubespark</a>. The images are as follows:</p>
 
 <table class="table">
-<tr>
-<th>Component</th>
-<th>Image</th>
-</tr>
+<tr><th>Component</th><th>Image</th></tr>
 <tr>
   <td>Spark Driver Image</td>
-  <td><code>kubespark/spark-driver:v2.1.0-kubernetes-0.1.0-alpha.2</code></td>
+  <td><code>kubespark/spark-driver:v2.1.0-kubernetes-0.2.0</code></td>
 </tr>
 <tr>
   <td>Spark Executor Image</td>
-  <td><code>kubespark/spark-executor:v2.1.0-kubernetes-0.1.0-alpha.2</code></td>
+  <td><code>kubespark/spark-executor:v2.1.0-kubernetes-0.2.0</code></td>
 </tr>
 <tr>
   <td>Spark Initialization Image</td>
-  <td><code>kubespark/spark-init:v2.1.0-kubernetes-0.1.0-alpha.2</code></td>
+  <td><code>kubespark/spark-init:v2.1.0-kubernetes-0.2.0</code></td>
 </tr>
 </table>
 
@@ -151,8 +124,7 @@ docker push registry-host:5000/spark-executor:latest
 docker push registry-host:5000/spark-init:latest
 </code></pre>
 
-<h2 id="submitting-applications-to-kubernetes">
-<a id="submitting-applications-to-kubernetes" class="anchor" href="#submitting-applications-to-kubernetes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Submitting Applications to Kubernetes</h2>
+<h2 id="submitting-applications-to-kubernetes">Submitting Applications to Kubernetes</h2>
 
 <p>Kubernetes applications can be executed via <code>spark-submit</code>. For example, to compute the value of pi, assuming the images
 are set up as described above:</p>
@@ -164,14 +136,14 @@ are set up as described above:</p>
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.1.0-alpha.2 \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
   local:///opt/spark/examples/jars/spark_examples_2.11-2.2.0.jar
 </code></pre>
 
 <p>The Spark master, specified either via passing the <code>--master</code> command line argument to <code>spark-submit</code> or by setting
-<code>spark.master</code> in the application’s configuration, must be a URL with the format <code>k8s://&lt;api_server_url&gt;</code>. Prefixing the
+<code>spark.master</code> in the application&#8217;s configuration, must be a URL with the format <code>k8s://&lt;api_server_url&gt;</code>. Prefixing the
 master string with <code>k8s://</code> will cause the Spark application to launch on the Kubernetes cluster, with the API server
 being contacted at <code>api_server_url</code>. If no HTTP protocol is specified in the URL, it defaults to <code>https</code>. For example,
 setting the master to <code>k8s://example.com:443</code> is equivalent to setting it to <code>k8s://https://example.com:443</code>, but to
@@ -190,11 +162,10 @@ Kubernetes master is running at http://127.0.0.1:8080
 the cluster.</p>
 
 <p>Finally, notice that in the above example we specify a jar with a specific URI with a scheme of <code>local://</code>. This URI is
-the location of the example jar that is already in the Docker image. Using dependencies that are on your machine’s local
+the location of the example jar that is already in the Docker image. Using dependencies that are on your machine&#8217;s local
 disk is discussed below.</p>
 
-<h2 id="dependency-management">
-<a id="dependency-management" class="anchor" href="#dependency-management" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependency Management</h2>
+<h2 id="dependency-management">Dependency Management</h2>
 
 <p>Application dependencies that are being submitted from your machine need to be sent to a <strong>resource staging server</strong>
 that the driver and executor can then communicate with to retrieve those dependencies. A YAML file denoting a minimal
@@ -217,9 +188,9 @@ YAML file requires you to have permissions to create Deployments, Services, and 
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.1.0-alpha.2 \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
   --conf spark.kubernetes.resourceStagingServer.uri=http://&lt;address-of-any-cluster-node&gt;:31000 \
   examples/jars/spark_examples_2.11-2.2.0.jar
 </code></pre>
@@ -227,22 +198,20 @@ YAML file requires you to have permissions to create Deployments, Services, and 
 <p>The Docker image for the resource staging server may also be built from source, in a similar manner to the driver
 and executor images. The Dockerfile is provided in <code>dockerfiles/resource-staging-server/Dockerfile</code>.</p>
 
-<p>The provided YAML file specifically sets the NodePort to 31000 on the service’s specification. If port 31000 is not
-available on any of the nodes of your cluster, you should remove the NodePort field from the service’s specification
+<p>The provided YAML file specifically sets the NodePort to 31000 on the service&#8217;s specification. If port 31000 is not
+available on any of the nodes of your cluster, you should remove the NodePort field from the service&#8217;s specification
 and allow the Kubernetes cluster to determine the NodePort itself. Be sure to provide the correct port in the resource
 staging server URI when submitting your application, in accordance to the NodePort chosen by the Kubernetes cluster.</p>
 
-<h3 id="dependency-management-without-the-resource-staging-server">
-<a id="dependency-management-without-the-resource-staging-server" class="anchor" href="#dependency-management-without-the-resource-staging-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependency Management Without The Resource Staging Server</h3>
+<h3 id="dependency-management-without-the-resource-staging-server">Dependency Management Without The Resource Staging Server</h3>
 
-<p>Note that this resource staging server is only required for submitting local dependencies. If your application’s
+<p>Note that this resource staging server is only required for submitting local dependencies. If your application&#8217;s
 dependencies are all hosted in remote locations like HDFS or http servers, they may be referred to by their appropriate
 remote URIs. Also, application dependencies can be pre-mounted into custom-built Docker images. Those dependencies
 can be added to the classpath by referencing them with <code>local://</code> URIs and/or setting the <code>SPARK_EXTRA_CLASSPATH</code>
 environment variable in your Dockerfiles.</p>
 
-<h3 id="accessing-kubernetes-clusters">
-<a id="accessing-kubernetes-clusters" class="anchor" href="#accessing-kubernetes-clusters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Accessing Kubernetes Clusters</h3>
+<h3 id="accessing-kubernetes-clusters">Accessing Kubernetes Clusters</h3>
 
 <p>For details about running on public cloud environments, such as Google Container Engine (GKE), refer to <a href="running-on-kubernetes-cloud.md">running Spark in the cloud with Kubernetes</a>.</p>
 
@@ -264,9 +233,9 @@ authenticating proxy to communicate with the api server directly without passing
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.1.0-alpha.2 \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
   local:///opt/spark/examples/jars/spark_examples_2.11-2.2.0.jar
 </code></pre>
 
@@ -275,8 +244,7 @@ The above mechanism using <code>kubectl proxy</code> can be used when we have au
 kubernetes-client library does not support. Authentication using X509 Client Certs and OAuth tokens
 is currently supported.</p>
 
-<h2 id="dynamic-executor-scaling">
-<a id="dynamic-executor-scaling" class="anchor" href="#dynamic-executor-scaling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dynamic Executor Scaling</h2>
+<h2 id="dynamic-executor-scaling">Dynamic Executor Scaling</h2>
 
 <p>Spark on Kubernetes supports Dynamic Allocation with cluster mode. This mode requires running
 an external shuffle service. This is typically a <a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/">daemonset</a>
@@ -309,30 +277,24 @@ the command may then look like the following:</p>
   local:///opt/spark/examples/jars/spark_examples_2.11-2.2.0.jar 10 400000 2
 </code></pre>
 
-<h2 id="advanced">
-<a id="advanced" class="anchor" href="#advanced" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced</h2>
+<h2 id="advanced">Advanced</h2>
 
-<h3 id="securing-the-resource-staging-server-with-tls">
-<a id="securing-the-resource-staging-server-with-tls" class="anchor" href="#securing-the-resource-staging-server-with-tls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Securing the Resource Staging Server with TLS</h3>
+<h3 id="securing-the-resource-staging-server-with-tls">Securing the Resource Staging Server with TLS</h3>
 
 <p>The default configuration of the resource staging server is not secured with TLS. It is highly recommended to configure
 this to protect the secrets and jars/files being submitted through the staging server.</p>
 
 <p>The YAML file in <code>conf/kubernetes-resource-staging-server.yaml</code> includes a ConfigMap resource that holds the resource
-staging server’s configuration. The properties can be adjusted here to make the resource staging server listen over TLS.
+staging server&#8217;s configuration. The properties can be adjusted here to make the resource staging server listen over TLS.
 Refer to the <a href="security.html">security</a> page for the available settings related to TLS. The namespace for the
-resource staging server is <code>kubernetes.resourceStagingServer</code>, so for example the path to the server’s keyStore would
+resource staging server is <code>kubernetes.resourceStagingServer</code>, so for example the path to the server&#8217;s keyStore would
 be set by <code>spark.ssl.kubernetes.resourceStagingServer.keyStore</code>.</p>
 
 <p>In addition to the settings specified by the previously linked security page, the resource staging server supports the
 following additional configurations:</p>
 
 <table class="table">
-<tr>
-<th>Property Name</th>
-<th>Default</th>
-<th>Meaning</th>
-</tr>
+<tr><th>Property Name</th><th>Default</th><th>Meaning</th></tr>
 <tr>
   <td><code>spark.ssl.kubernetes.resourceStagingServer.keyPem</code></td>
   <td>(none)</td>
@@ -372,9 +334,9 @@ following additional configurations:</p>
 </table>
 
 <p>Note that while the properties can be set in the ConfigMap, you will still need to consider the means of mounting the
-appropriate secret files into the resource staging server’s container. A common mechanism that is used for this is
+appropriate secret files into the resource staging server&#8217;s container. A common mechanism that is used for this is
 to use <a href="https://kubernetes.io/docs/concepts/configuration/secret/">Kubernetes secrets</a> that are mounted as secret
-volumes. Refer to the appropriate Kubernetes documentation for guidance and adjust the resource staging server’s
+volumes. Refer to the appropriate Kubernetes documentation for guidance and adjust the resource staging server&#8217;s
 specification in the provided YAML file accordingly.</p>
 
 <p>Finally, when you submit your application, you must specify either a trustStore or a PEM-encoded certificate file to
@@ -389,27 +351,22 @@ communicate with the resource staging server over TLS. The trustStore can be set
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.1.0-alpha.2 \
-  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.1.0-alpha.2 \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
+  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
   --conf spark.kubernetes.resourceStagingServer.uri=https://&lt;address-of-any-cluster-node&gt;:31000 \
   --conf spark.ssl.kubernetes.resourceStagingServer.enabled=true \
   --conf spark.ssl.kubernetes.resourceStagingServer.clientCertPem=/home/myuser/cert.pem \
   examples/jars/spark_examples_2.11-2.2.0.jar
 </code></pre>
 
-<h3 id="spark-properties">
-<a id="spark-properties" class="anchor" href="#spark-properties" aria-hidden="true"><span class="octicon octicon-link"></span></a>Spark Properties</h3>
+<h3 id="spark-properties">Spark Properties</h3>
 
 <p>Below are some other common properties that are specific to Kubernetes. Most of the other configurations are the same
 from the other deployment modes. See the <a href="configuration.html">configuration page</a> for more information on those.</p>
 
 <table class="table">
-<tr>
-<th>Property Name</th>
-<th>Default</th>
-<th>Meaning</th>
-</tr>
+<tr><th>Property Name</th><th>Default</th><th>Meaning</th></tr>
 <tr>
   <td><code>spark.kubernetes.namespace</code></td>
   <td><code>default</code></td>
@@ -562,6 +519,69 @@ from the other deployment modes. See the <a href="configuration.html">configurat
   </td>
 </tr>
 <tr>
+  <td><code>spark.kubernetes.authenticate.resourceStagingServer.caCertFile</code></td>
+  <td>(none)</td>
+  <td>
+    Path to the CA cert file for connecting to the Kubernetes API server over TLS from the resource staging server when
+    it monitors objects in determining when to clean up resource bundles.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.authenticate.resourceStagingServer.clientKeyFile</code></td>
+  <td>(none)</td>
+  <td>
+    Path to the client key file for authenticating against the Kubernetes API server from the resource staging server
+    when it monitors objects in determining when to clean up resource bundles. The resource staging server must have
+    credentials that allow it to view API objects in any namespace.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.authenticate.resourceStagingServer.clientCertFile</code></td>
+  <td>(none)</td>
+  <td>
+    Path to the client cert file for authenticating against the Kubernetes API server from the resource staging server
+    when it monitors objects in determining when to clean up resource bundles. The resource staging server must have
+    credentials that allow it to view API objects in any namespace.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.authenticate.resourceStagingServer.oauthToken</code></td>
+  <td>(none)</td>
+  <td>
+    OAuth token value for authenticating against the Kubernetes API server from the resource staging server
+    when it monitors objects in determining when to clean up resource bundles. The resource staging server must have
+    credentials that allow it to view API objects in any namespace. Note that this cannot be set at the same time as
+    <code>spark.kubernetes.authenticate.resourceStagingServer.oauthTokenFile</code>.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.authenticate.resourceStagingServer.oauthTokenFile</code></td>
+  <td>(none)</td>
+  <td>
+    File containing the OAuth token to use when authenticating against the against the Kubernetes API server from the
+    resource staging server, when it monitors objects in determining when to clean up resource bundles. The resource
+    staging server must have credentials that allow it to view API objects in any namespace. Note that this cannot be
+    set at the same time as <code>spark.kubernetes.authenticate.resourceStagingServer.oauthToken</code>.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.authenticate.resourceStagingServer.useServiceAccountCredentials</code></td>
+  <td>true</td>
+  <td>
+    Whether or not to use a service account token and a service account CA certificate when the resource staging server
+    authenticates to Kubernetes. If this is set, interactions with Kubernetes will authenticate using a token located at
+    <code>/var/run/secrets/kubernetes.io/serviceaccount/token</code> and the CA certificate located at
+    <code>/var/run/secrets/kubernetes.io/serviceaccount/ca.crt</code>. Note that if
+    <code>spark.kubernetes.authenticate.resourceStagingServer.oauthTokenFile</code> is set, it takes precedence
+    over the usage of the service account token file. Also, if
+    <code>spark.kubernetes.authenticate.resourceStagingServer.caCertFile</code> is set, it takes precedence over using
+    the service account's CA certificate file. This generally should be set to true (the default value) when the
+    resource staging server is deployed as a Kubernetes pod, but should be set to false if the resource staging server
+    is deployed by other means (i.e. when running the staging server process outside of Kubernetes). The resource
+    staging server must have credentials that allow it to view API objects in any namespace.
+  </td>
+</tr>
+<tr>
   <td><code>spark.kubernetes.executor.memoryOverhead</code></td>
   <td>executorMemory * 0.10, with minimum of 384</td>
   <td>
@@ -585,6 +605,23 @@ from the other deployment modes. See the <a href="configuration.html">configurat
   <td>
     Custom annotations that will be added to the driver pod. This should be a comma-separated list of label key-value
     pairs, where each annotation is in the format <code>key=value</code>.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.executor.labels</code></td>
+  <td>(none)</td>
+  <td>
+    Custom labels that will be added to the executor pods. This should be a comma-separated list of label key-value
+    pairs, where each label is in the format <code>key=value</code>. Note that Spark also adds its own labels to the
+    executor pods for bookkeeping purposes.
+  </td>
+</tr>
+<tr>
+  <td><code>spark.kubernetes.executor.annotations</code></td>
+  <td>(none)</td>
+  <td>
+    Custom annotations that will be added to the executor pods. This should be a comma-separated list of annotation
+    key-value pairs, where each annotation is in the format <code>key=value</code>.
   </td>
 </tr>
 <tr>
@@ -623,8 +660,7 @@ from the other deployment modes. See the <a href="configuration.html">configurat
 </tr>
 <tr>
   <td><code>spark.kubernetes.resourceStagingServer.internal.uri</code></td>
-  <td>Value of <code>spark.kubernetes.resourceStagingServer.uri</code>
-</td>
+  <td>Value of <code>spark.kubernetes.resourceStagingServer.uri</code></td>
   <td>
     URI of the resource staging server to communicate with when init-containers bootstrap the driver and executor pods
     with submitted local dependencies. Note that this URI must by the pods running in the cluster. This is useful to
@@ -634,8 +670,7 @@ from the other deployment modes. See the <a href="configuration.html">configurat
 </tr>
 <tr>
   <td><code>spark.ssl.kubernetes.resourceStagingServer.internal.trustStore</code></td>
-  <td>Value of <code>spark.ssl.kubernetes.resourceStagingServer.trustStore</code>
-</td>
+  <td>Value of <code>spark.ssl.kubernetes.resourceStagingServer.trustStore</code></td>
   <td>
     Location of the trustStore file to use when communicating with the resource staging server over TLS, as
     init-containers bootstrap the driver and executor pods with submitted local dependencies. This can be a URI with a
@@ -662,8 +697,7 @@ from the other deployment modes. See the <a href="configuration.html">configurat
 &lt;/tr&gt;
 <tr>
   <td><code>spark.ssl.kubernetes.resourceStagingServer.internal.clientCertPem</code></td>
-  <td>Value of <code>spark.ssl.kubernetes.resourceStagingServer.clientCertPem</code>
-</td>
+  <td>Value of <code>spark.ssl.kubernetes.resourceStagingServer.clientCertPem</code></td>
   <td>
     Location of the certificate file to use when communicating with the resource staging server over TLS, as
     init-containers bootstrap the driver and executor pods with submitted local dependencies. This can be a URI with a
@@ -695,13 +729,23 @@ from the other deployment modes. See the <a href="configuration.html">configurat
     Interval between reports of the current Spark job status in cluster mode.
   </td>
 </tr>
-&lt;/table&gt;
-</code>
-</td>
-</tr></code>
-</td>
+<tr>
+  <td><code>spark.kubernetes.docker.image.pullPolicy</code></td>
+  <td><code>IfNotPresent</code></td>
+  <td>
+    Docker image pull policy used when pulling Docker images with Kubernetes.
+  </td>
 </tr>
-</table>
+&lt;/table&gt;
+
+
+## Current Limitations
+
+Running Spark on Kubernetes is currently an experimental feature. Some restrictions on the current implementation that
+should be lifted in the future include:
+* Applications can only run in cluster mode.
+* Only Scala and Java applications can be run.
+</code></td></tr></code></td></tr></table>
 
                 </div>
             
