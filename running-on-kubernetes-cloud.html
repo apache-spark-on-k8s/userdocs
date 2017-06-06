@@ -7,9 +7,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Apache Spark on Kubernetes - Spark 2.1.0 Documentation</title>
-        
-          <meta name="description" content="User Documentation for Apache Spark on Kubernetes">
+        <title>Running Spark in the cloud with Kubernetes - Spark 2.1.0 Documentation</title>
         
 
         
@@ -57,27 +55,31 @@
             
                 <div class="content" id="content">
                     
-                        <h1 class="title">Apache Spark on Kubernetes</h1>
+                        <h1 class="title">Running Spark in the cloud with Kubernetes</h1>
                     
-                    <h3 id="overview">Overview</h3>
+                    <p>A Kubernetes cluster may be brought up on different cloud providers or on premise. It is commonly provisioned through <a href="https://cloud.google.com/container-engine/">Google Container Engine</a>, or using <a href="https://github.com/kubernetes/kops">kops</a> on AWS, or on premise using <a href="https://kubernetes.io/docs/getting-started-guides/kubeadm/">kubeadm</a>.</p>
 
-<p>This site is for user documentation for running Apache Spark with a native Kubernetes scheduling backend. 
-This repository <a href="https://github.com/apache-spark-on-k8s/spark">apache-spark-on-k8s/spark</a>, 
-contains a fork of Apache Spark that enables running Spark jobs natively on a Kubernetes cluster.</p>
-
-<h3 id="what-is-this">What is this?</h3>
-
-<p>This is a collaboratively maintained project working on 
-<a href="https://issues.apache.org/jira/browse/SPARK-18278">SPARK-18278</a>. 
-The goal is to bring native support for Spark to use Kubernetes as a cluster manager, 
-in a fully supported way on par with the Spark Standalone, Mesos, and Apache YARN cluster managers.</p>
-
-<h3 id="contents">Contents</h3>
+<h2 id="running-on-google-container-engine-gke">Running on Google Container Engine (GKE)</h2>
 
 <ul>
-  <li><a href="./running-on-kubernetes.html">Running Spark on Kubernetes</a></li>
-  <li><a href="./running-on-kubernetes-cloud.html">Running Spark in Cloud Environments</a></li>
-  <li><a href="./contribute.html">Contribute</a></li>
+  <li>Create a GKE <a href="https://cloud.google.com/container-engine/docs/clusters/operations">container cluster</a>.</li>
+  <li>Obtain kubectl and <a href="https://cloud.google.com/container-engine/docs/clusters/operations#configuring_kubectl">configure</a> it appropriately.</li>
+  <li>
+    <p>Find the identity of the master associated with this project.</p>
+
+    <blockquote>
+      <p>kubectl cluster-info
+  Kubernetes master is running at https://<master-ip>:443</master-ip></p>
+    </blockquote>
+  </li>
+  <li>Run spark-submit with the master option set to <code>k8s://https://&lt;master-ip&gt;:443</code>. The instructions for running spark-submit are provided in the <a href="running-on-kubernetes.md">running on kubernetes</a> tutorial.</li>
+  <li>Check that your driver pod, and subsequently your executor pods are launched using <code>kubectl get pods</code>.</li>
+  <li>Read the stdout and stderr of the driver pod using <code>kubectl logs &lt;name-of-driver-pod&gt;</code>, or stream the logs using <code>kubectl logs -f &lt;name-of-driver-pod&gt;</code>.</li>
+</ul>
+
+<p>Known issues:</p>
+<ul>
+  <li>If you face OAuth token expiry errors when you run spark-submit, it is likely because the token needs to be refreshed. The easiest way to fix this is to run any <code>kubectl</code> command, say, <code>kubectl version</code> and then retry your submission.</li>
 </ul>
 
                 </div>
