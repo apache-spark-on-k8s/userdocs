@@ -14,7 +14,7 @@ A Kubernetes cluster may be brought up on different cloud providers or on premis
     > kubectl cluster-info
     Kubernetes master is running at https://<master-ip>:443
 
-* Run spark-submit with the master option set to `k8s://https://<master-ip>:443`. The instructions for running spark-submit are provided in the [running on kubernetes](running-on-kubernetes.md) tutorial.
+* Run spark-submit with the master option set to `k8s://https://<master-ip>:443`. The instructions for running spark-submit are provided in the [running on kubernetes](./running-on-kubernetes.html) tutorial.
 * Check that your driver pod, and subsequently your executor pods are launched using `kubectl get pods`.
 * Read the stdout and stderr of the driver pod using `kubectl logs <name-of-driver-pod>`, or stream the logs using `kubectl logs -f <name-of-driver-pod>`.
 
