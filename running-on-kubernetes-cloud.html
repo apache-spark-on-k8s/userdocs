@@ -72,7 +72,7 @@
   Kubernetes master is running at https://<master-ip>:443</master-ip></p>
     </blockquote>
   </li>
-  <li>Run spark-submit with the master option set to <code>k8s://https://&lt;master-ip&gt;:443</code>. The instructions for running spark-submit are provided in the <a href="running-on-kubernetes.md">running on kubernetes</a> tutorial.</li>
+  <li>Run spark-submit with the master option set to <code>k8s://https://&lt;master-ip&gt;:443</code>. The instructions for running spark-submit are provided in the <a href="./running-on-kubernetes.html">running on kubernetes</a> tutorial.</li>
   <li>Check that your driver pod, and subsequently your executor pods are launched using <code>kubectl get pods</code>.</li>
   <li>Read the stdout and stderr of the driver pod using <code>kubectl logs &lt;name-of-driver-pod&gt;</code>, or stream the logs using <code>kubectl logs -f &lt;name-of-driver-pod&gt;</code>.</li>
 </ul>
