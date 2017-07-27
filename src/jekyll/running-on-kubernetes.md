@@ -36,15 +36,27 @@ If you wish to use pre-built docker images, you may use the images published in
 <tr><th>Component</th><th>Image</th></tr>
 <tr>
   <td>Spark Driver Image</td>
-  <td><code>kubespark/spark-driver:v2.1.0-kubernetes-0.2.0</code></td>
+  <td><code>kubespark/spark-driver:v2.1.0-kubernetes-0.3.0</code></td>
 </tr>
 <tr>
   <td>Spark Executor Image</td>
-  <td><code>kubespark/spark-executor:v2.1.0-kubernetes-0.2.0</code></td>
+  <td><code>kubespark/spark-executor:v2.1.0-kubernetes-0.3.0</code></td>
 </tr>
 <tr>
   <td>Spark Initialization Image</td>
-  <td><code>kubespark/spark-init:v2.1.0-kubernetes-0.2.0</code></td>
+  <td><code>kubespark/spark-init:v2.1.0-kubernetes-0.3.0</code></td>
+</tr>
+<tr>
+  <td>Spark Staging Server Image</td>
+  <td><code>kubespark/spark-resource-staging-server:v2.1.0-kubernetes-0.3.0</code></td>
+</tr>
+<tr>
+  <td>PySpark Driver Image</td>
+  <td><code>kubespark/driver-py:v2.1.0-kubernetes-0.3.0</code></td>
+</tr>
+<tr>
+  <td>PySpark Executor Image</td>
+  <td><code>kubespark/executor-py:v2.1.0-kubernetes-0.3.0</code></td>
 </tr>
 </table>
 
@@ -76,9 +88,9 @@ are set up as described above:
       --kubernetes-namespace default \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
       local:///opt/spark/examples/jars/spark_examples_2.11-2.2.0.jar
 
 The Spark master, specified either via passing the `--master` command line argument to `spark-submit` or by setting
@@ -125,9 +137,9 @@ and then you can compute the value of Pi as follows:
       --kubernetes-namespace default \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
       --conf spark.kubernetes.resourceStagingServer.uri=http://<address-of-any-cluster-node>:31000 \
       examples/jars/spark_examples_2.11-2.2.0.jar
 
@@ -166,9 +178,9 @@ If our local proxy were listening on port 8001, we would have our submission loo
       --kubernetes-namespace default \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
       local:///opt/spark/examples/jars/spark_examples_2.11-2.2.0.jar
 
 Communication between Spark and Kubernetes clusters is performed using the fabric8 kubernetes-client library.
@@ -282,9 +294,9 @@ communicate with the resource staging server over TLS. The trustStore can be set
       --kubernetes-namespace default \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.2.0 \
-      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.2.0 \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
       --conf spark.kubernetes.resourceStagingServer.uri=https://<address-of-any-cluster-node>:31000 \
       --conf spark.ssl.kubernetes.resourceStagingServer.enabled=true \
       --conf spark.ssl.kubernetes.resourceStagingServer.clientCertPem=/home/myuser/cert.pem \
