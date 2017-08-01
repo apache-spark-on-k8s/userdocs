@@ -159,6 +159,70 @@ remote URIs. Also, application dependencies can be pre-mounted into custom-built
 can be added to the classpath by referencing them with `local://` URIs and/or setting the `SPARK_EXTRA_CLASSPATH`
 environment variable in your Dockerfiles.
 
+### Python Support 
+
+With the ever growing support for Python by data scientists, we have supported the submission of PySpark applications.
+These applications follow the general syntax that you would expect from other cluster managers. The submission of a PySpark
+job is similar to the submission of Java/Scala applications except you do not supply a class, as expected. 
+Here is how you would execute a Spark-Pi example:
+
+    bin/spark-submit \
+      --deploy-mode cluster \
+      --master k8s://https://<k8s-apiserver-host>:<k8s-apiserver-port> \
+      --kubernetes-namespace default \
+      --conf spark.executor.instances=5 \
+      --conf spark.app.name=spark-pi \
+      --conf spark.kubernetes.driver.docker.image=kubespark/driver-py:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/executor-py:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
+       local:///opt/spark/examples/src/main/python/pi.py 10
+
+With Python support it is expected to distribute `.egg`, `.zip` and `.py` libraries to executors via the `--py-files` option. 
+We support this as well, as seen with the following example:
+    
+    bin/spark-submit \
+      --deploy-mode cluster \
+      --master k8s://https://<k8s-apiserver-host>:<k8s-apiserver-port> \
+      --kubernetes-namespace default \
+      --conf spark.executor.instances=5 \
+      --conf spark.app.name=spark-pi \
+      --conf spark.kubernetes.driver.docker.image=kubespark/driver-py:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/executor-py:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
+      --py-files local:///opt/spark/examples/src/main/python/sort.py \
+      local:///opt/spark/examples/src/main/python/pi.py 10
+      
+You may also customize your Docker images to use different `pip` packages that suit your use-case. As you can see
+with the current `driver-py` Docker image we have commented out the current pip module support that you can uncomment
+to use:
+
+    ...
+    ADD examples /opt/spark/examples
+    ADD python /opt/spark/python
+    
+    RUN apk add --no-cache python && \
+        python -m ensurepip && \
+        rm -r /usr/lib/python*/ensurepip && \
+        pip install --upgrade pip setuptools && \
+        rm -r /root/.cache
+    # UNCOMMENT THE FOLLOWING TO START PIP INSTALLING PYTHON PACKAGES
+    # RUN apk add --update alpine-sdk python-dev
+    # RUN pip install numpy
+    ...
+
+And bake into your docker image whichever PySpark files you wish to include by merely appending to the following exec
+command with your appropriate file (i.e. MY_SPARK_FILE)
+
+    ...
+    CMD SPARK_CLASSPATH="${SPARK_HOME}/jars/*" && \
+        if ! [ -z ${SPARK_MOUNTED_CLASSPATH+x} ]; then SPARK_CLASSPATH="$SPARK_MOUNTED_CLASSPATH:$SPARK_CLASSPATH"; fi && \
+        if ! [ -z ${SPARK_SUBMIT_EXTRA_CLASSPATH+x} ]; then SPARK_CLASSPATH="$SPARK_SUBMIT_EXTRA_CLASSPATH:$SPARK_CLASSPATH"; fi && \
+        if ! [ -z ${SPARK_EXTRA_CLASSPATH+x} ]; then SPARK_CLASSPATH="$SPARK_EXTRA_CLASSPATH:$SPARK_CLASSPATH"; fi && \
+        if ! [ -z ${SPARK_MOUNTED_FILES_DIR} ]; then cp -R "$SPARK_MOUNTED_FILES_DIR/." .; fi && \
+        exec /sbin/tini -- ${JAVA_HOME}/bin/java $SPARK_DRIVER_JAVA_OPTS -cp $SPARK_CLASSPATH \
+        -Xms$SPARK_DRIVER_MEMORY -Xmx$SPARK_DRIVER_MEMORY \
+        $SPARK_DRIVER_CLASS $PYSPARK_PRIMARY MY_PYSPARK_FILE,$PYSPARK_FILES $SPARK_DRIVER_ARGS
+      
 ### Accessing Kubernetes Clusters
 
 Spark-submit also supports submission through the
