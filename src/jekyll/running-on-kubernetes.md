@@ -169,13 +169,14 @@ Here is how you would execute a Spark-Pi example:
     bin/spark-submit \
       --deploy-mode cluster \
       --master k8s://https://<k8s-apiserver-host>:<k8s-apiserver-port> \
-      --kubernetes-namespace default \
+      --kubernetes-namespace <k8s-namespace> \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
       --conf spark.kubernetes.driver.docker.image=kubespark/driver-py:v2.1.0-kubernetes-0.3.0 \
       --conf spark.kubernetes.executor.docker.image=kubespark/executor-py:v2.1.0-kubernetes-0.3.0 \
       --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
-       local:///opt/spark/examples/src/main/python/pi.py 10
+      --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.1.0-k8s-0.3.0-SNAPSHOT.jar \
+      local:///opt/spark/examples/src/main/python/pi.py 10
 
 With Python support it is expected to distribute `.egg`, `.zip` and `.py` libraries to executors via the `--py-files` option. 
 We support this as well, as seen with the following example:
@@ -183,14 +184,16 @@ We support this as well, as seen with the following example:
     bin/spark-submit \
       --deploy-mode cluster \
       --master k8s://https://<k8s-apiserver-host>:<k8s-apiserver-port> \
-      --kubernetes-namespace default \
+      --kubernetes-namespace <k8s-namespace> \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
       --conf spark.kubernetes.driver.docker.image=kubespark/driver-py:v2.1.0-kubernetes-0.3.0 \
       --conf spark.kubernetes.executor.docker.image=kubespark/executor-py:v2.1.0-kubernetes-0.3.0 \
       --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
+      --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.1.0-k8s-0.3.0-SNAPSHOT.jar \
       --py-files local:///opt/spark/examples/src/main/python/sort.py \
       local:///opt/spark/examples/src/main/python/pi.py 10
+
       
 You may also customize your Docker images to use different `pip` packages that suit your use-case. As you can see
 with the current `driver-py` Docker image we have commented out the current pip module support that you can uncomment
