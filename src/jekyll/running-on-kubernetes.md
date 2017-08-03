@@ -115,51 +115,7 @@ Finally, notice that in the above example we specify a jar with a specific URI w
 the location of the example jar that is already in the Docker image. Using dependencies that are on your machine's local
 disk is discussed below.
 
-## Dependency Management
-
-Application dependencies that are being submitted from your machine need to be sent to a **resource staging server**
-that the driver and executor can then communicate with to retrieve those dependencies. A YAML file denoting a minimal
-set of Kubernetes resources that runs this service is located in the file `conf/kubernetes-resource-staging-server.yaml`.
-This YAML file configures a Deployment with one pod running the resource staging server configured with a ConfigMap,
-and exposes the server through a Service with a fixed NodePort. Deploying a resource staging server with the included
-YAML file requires you to have permissions to create Deployments, Services, and ConfigMaps.
-
-To run the resource staging server with default configurations, the Kubernetes resources can be created:
-
-    kubectl create -f conf/kubernetes-resource-staging-server.yaml
-
-and then you can compute the value of Pi as follows:
-
-    bin/spark-submit \
-      --deploy-mode cluster \
-      --class org.apache.spark.examples.SparkPi \
-      --master k8s://<k8s-apiserver-host>:<k8s-apiserver-port> \
-      --kubernetes-namespace default \
-      --conf spark.executor.instances=5 \
-      --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.3.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.3.0 \
-      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
-      --conf spark.kubernetes.resourceStagingServer.uri=http://<address-of-any-cluster-node>:31000 \
-      examples/jars/spark_examples_2.11-2.2.0.jar
-
-The Docker image for the resource staging server may also be built from source, in a similar manner to the driver
-and executor images. The Dockerfile is provided in `dockerfiles/resource-staging-server/Dockerfile`.
-
-The provided YAML file specifically sets the NodePort to 31000 on the service's specification. If port 31000 is not
-available on any of the nodes of your cluster, you should remove the NodePort field from the service's specification
-and allow the Kubernetes cluster to determine the NodePort itself. Be sure to provide the correct port in the resource
-staging server URI when submitting your application, in accordance to the NodePort chosen by the Kubernetes cluster.
-
-### Dependency Management Without The Resource Staging Server
-
-Note that this resource staging server is only required for submitting local dependencies. If your application's
-dependencies are all hosted in remote locations like HDFS or http servers, they may be referred to by their appropriate
-remote URIs. Also, application dependencies can be pre-mounted into custom-built Docker images. Those dependencies
-can be added to the classpath by referencing them with `local://` URIs and/or setting the `SPARK_EXTRA_CLASSPATH`
-environment variable in your Dockerfiles.
-
-### Python Support 
+## Python Support 
 
 With the ever growing support for Python by data scientists, we have supported the submission of PySpark applications.
 These applications follow the general syntax that you would expect from other cluster managers. The submission of a PySpark
@@ -226,6 +182,51 @@ command with your appropriate file (i.e. MY_SPARK_FILE)
         -Xms$SPARK_DRIVER_MEMORY -Xmx$SPARK_DRIVER_MEMORY \
         $SPARK_DRIVER_CLASS $PYSPARK_PRIMARY MY_PYSPARK_FILE,$PYSPARK_FILES $SPARK_DRIVER_ARGS
       
+
+## Dependency Management
+
+Application dependencies that are being submitted from your machine need to be sent to a **resource staging server**
+that the driver and executor can then communicate with to retrieve those dependencies. A YAML file denoting a minimal
+set of Kubernetes resources that runs this service is located in the file `conf/kubernetes-resource-staging-server.yaml`.
+This YAML file configures a Deployment with one pod running the resource staging server configured with a ConfigMap,
+and exposes the server through a Service with a fixed NodePort. Deploying a resource staging server with the included
+YAML file requires you to have permissions to create Deployments, Services, and ConfigMaps.
+
+To run the resource staging server with default configurations, the Kubernetes resources can be created:
+
+    kubectl create -f conf/kubernetes-resource-staging-server.yaml
+
+and then you can compute the value of Pi as follows:
+
+    bin/spark-submit \
+      --deploy-mode cluster \
+      --class org.apache.spark.examples.SparkPi \
+      --master k8s://<k8s-apiserver-host>:<k8s-apiserver-port> \
+      --kubernetes-namespace default \
+      --conf spark.executor.instances=5 \
+      --conf spark.app.name=spark-pi \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.1.0-kubernetes-0.3.0 \
+      --conf spark.kubernetes.resourceStagingServer.uri=http://<address-of-any-cluster-node>:31000 \
+      examples/jars/spark_examples_2.11-2.2.0.jar
+
+The Docker image for the resource staging server may also be built from source, in a similar manner to the driver
+and executor images. The Dockerfile is provided in `dockerfiles/resource-staging-server/Dockerfile`.
+
+The provided YAML file specifically sets the NodePort to 31000 on the service's specification. If port 31000 is not
+available on any of the nodes of your cluster, you should remove the NodePort field from the service's specification
+and allow the Kubernetes cluster to determine the NodePort itself. Be sure to provide the correct port in the resource
+staging server URI when submitting your application, in accordance to the NodePort chosen by the Kubernetes cluster.
+
+### Dependency Management Without The Resource Staging Server
+
+Note that this resource staging server is only required for submitting local dependencies. If your application's
+dependencies are all hosted in remote locations like HDFS or http servers, they may be referred to by their appropriate
+remote URIs. Also, application dependencies can be pre-mounted into custom-built Docker images. Those dependencies
+can be added to the classpath by referencing them with `local://` URIs and/or setting the `SPARK_EXTRA_CLASSPATH`
+environment variable in your Dockerfiles.
+
 ### Accessing Kubernetes Clusters
 
 Spark-submit also supports submission through the
