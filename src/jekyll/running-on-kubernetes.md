@@ -754,4 +754,4 @@ from the other deployment modes. See the [configuration page](configuration.html
 Running Spark on Kubernetes is currently an experimental feature. Some restrictions on the current implementation that
 should be lifted in the future include:
 * Applications can only run in cluster mode.
-* Only Scala and Java applications can be run.
+* Only Scala, Java, and Python applications can be run.
