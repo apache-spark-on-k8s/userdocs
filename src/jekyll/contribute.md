@@ -11,6 +11,7 @@ This is a collaborative effort completely in the open source community, involvin
 different companies who are interested in seeing this feature successfully completed and merged. 
 Companies currently active in this project include (alphabetically):
 
+* Bloomberg
 * Google
 * Haiwen
 * Hyperpilot
