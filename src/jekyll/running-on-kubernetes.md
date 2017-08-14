@@ -21,7 +21,7 @@ you can list these resources by running `kubectl get pods` `kubectl get configma
 should give you a list of pods and configmaps (if any) respectively.
 * You must have a spark distribution with Kubernetes support. This may be obtained from the
 [release tarball](https://github.com/apache-spark-on-k8s/spark/releases) or by
-[building Spark with Kubernetes support](../resource-managers/kubernetes/README.md#building-spark-with-kubernetes-support).
+[building Spark with Kubernetes support](https://github.com/apache-spark-on-k8s/spark/blob/branch-2.2-kubernetes/resource-managers/kubernetes/README.md#building-spark-with-kubernetes-support).
 
 ## Driver & Executor Images
 
