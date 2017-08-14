@@ -746,6 +746,46 @@ from the other deployment modes. See the [configuration page](configuration.html
     Docker image pull policy used when pulling Docker images with Kubernetes.
   </td>
 </tr>
+<tr>
+   <td><code>spark.kubernetes.driver.limit.cores</code></td>
+   <td>(none)</td>
+   <td>
+     Specify the hard cpu limit for the driver pod
+   </td>
+ </tr>
+ <tr>
+   <td><code>spark.kubernetes.executor.limit.cores</code></td>
+   <td>(none)</td>
+   <td>
+     Specify the hard cpu limit for a single executor pod
+   </td>
+ </tr>
+ <tr>
+   <td><code>spark.kubernetes.node.selector.[labelKey]</code></td> 
+   <td>(none)</td>
+   <td>
+     Adds to the node selector of the driver pod and executor pods, with key <code>labelKey</code> and the value as the 
+     configuration's value. For example, setting <code>spark.kubernetes.node.selector.identifier</code> to <code>myIdentifier</code>
+     will result in the driver pod and executors having a node selector with key <code>identifier</code> and value 
+      <code>myIdentifier</code>. Multiple node selector keys can be added by setting multiple configurations with this prefix.
+    </td>
+  </tr>
+ <tr>
+   <td><code>spark.executorEnv.[EnvironmentVariableName]</code></td> 
+   <td>(none)</td>
+   <td>
+     Add the environment variable specified by <code>EnvironmentVariableName</code> to
+     the Executor process. The user can specify multiple of these to set multiple environment variables.
+   </td>
+ </tr>
+ <tr>
+   <td><code>spark.kubernetes.driverEnv.[EnvironmentVariableName]</code></td> 
+   <td>(none)</td>
+   <td>
+     Add the environment variable specified by <code>EnvironmentVariableName</code> to
+     the Driver process. The user can specify multiple of these to set multiple environment variables.
+   </td>
+ </tr>
 </table>
 
 
