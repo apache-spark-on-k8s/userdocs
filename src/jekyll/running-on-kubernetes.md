@@ -227,7 +227,7 @@ remote URIs. Also, application dependencies can be pre-mounted into custom-built
 can be added to the classpath by referencing them with `local://` URIs and/or setting the `SPARK_EXTRA_CLASSPATH`
 environment variable in your Dockerfiles.
 
-### Accessing Kubernetes Clusters
+## Accessing Kubernetes Clusters
 
 Spark-submit also supports submission through the
 [local kubectl proxy](https://kubernetes.io/docs/user-guide/accessing-the-cluster/#using-kubectl-proxy). One can use the
@@ -289,6 +289,57 @@ the command may then look like the following:
       local:///opt/spark/examples/jars/spark_examples_2.11-2.2.0.jar 10 400000 2
 
 ## Advanced
+
+### Configuring Kubernetes Roles and Service Accounts
+
+In Kubernetes clusters with [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/) enabled, users can configure Kubernetes RBAC roles and service accounts used by the various Spark on Kubernetes components to access the Kubernetes API server. 
+
+#### Driver
+
+The Spark driver pod uses a Kubernetes service account to access the Kubernetes API server to create and watch executor pods. The service account used by the driver pod must have the appropriate permission for the driver to be able to do its work. 
+
+Specifically, at minimum, the service account must be granted a [`Role` or `ClusterRole`](https://kubernetes.io/docs/admin/authorization/rbac/#role-and-clusterrole) that allows driver pods to create pods and services. By default, the driver pod is automatically assigned the `default` service account in the namespace specified by `--kubernetes-namespace`, if no service account is specified when the pod gets created. 
+
+Depending on the version and setup of Kubernetes deployed, this `default` service account may or may not have the role that allows driver pods to create pods and services under the default Kubernetes [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/) policies. Sometimes users may need to specify a custom service account that has the right role granted. Spark on Kubernetes supports specifying a custom service account to be used by the driver pod through the configuration property `spark.kubernetes.authenticate.driver.serviceAccountName=<service account name>`. For example to make the driver pod to use the `spark` service account, a user simply adds the following option to the `spark-submit` command:
+
+```
+--conf spark.kubernetes.authenticate.driver.serviceAccountName=spark
+```
+
+To create a custom service account, a user can use the `kubectl create serviceaccount` command. For example, the following command creates a service account named `spark`:
+
+```
+kubectl create serviceaccount spark
+``` 
+
+To grant a service account a `Role` or `ClusterRole`, a `RoleBinding` or `ClusterRoleBinding` is needed. To create a `RoleBinding` or `ClusterRoleBinding`, a user can use the `kubectl create rolebinding` (or `clusterrolebinding` for `ClusterRoleBinding`) command. For example, the following command creates an `edit` `ClusterRole` in the `default` namespace and grants it to the `spark` service account created above:
+
+```
+kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
+```
+
+Note that a `Role` can only be used to grant access to resources (like pods) within a single namespace, whereas a `ClusterRole` can be used to grant access to cluster-scoped resources (like nodes) as well as namespaced resources (like pods) across all namespaces. For Spark on Kubernetes, since the driver always creates executor pods in the same namespace, a `Role` is sufficient, although users may use a `ClusterRole` instead. For more information on RBAC authorization and how to configure Kubernetes service accounts for pods, please refer to [Using RBAC Authorization](https://kubernetes.io/docs/admin/authorization/rbac/) and [Configure Service Accounts for Pods](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).   
+
+#### Resource Staging Server
+
+The Resource Staging Server (RSS) watches Spark driver pods to detect completed Spark applications so it knows when to safely delete resource bundles of the applications. When running as a pod in the same Kubernetes cluster as the Spark applications, by default (`spark.kubernetes.authenticate.resourceStagingServer.useServiceAccountCredentials` defaults to `true`), the RSS uses the default Kubernetes service account token located at `/var/run/secrets/kubernetes.io/serviceaccount/token` and the CA certificate located at `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`. Note that the locations referred to here are both within the RSS pod and are used by Kubernetes by default. 
+
+When running outside the Kubernetes cluster or when `spark.kubernetes.authenticate.resourceStagingServer.useServiceAccountCredentials` is set to `false`, the credentials for authenticating with the Kubernetes API server can be specified using other configuration properties as documented in [Spark Properties](#spark-properties). Regardless of which credential is used, the credential must allow the RSS to view pods in any namespace. 
+
+#### Shuffle Service
+
+The shuffle service runs as a Kubernetes `DaemonSet`. Each pod of the shuffle service watches Spark driver pods so at minimum it needs a role that allows it to view pods. Additionally, the shuffle service uses a [`hostPath`](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath) volume for shuffle data. Writing to a `hostPath` volume requires either that the shuffle service process runs as root in a [privileged](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) container or that the user is able to modify the file permissions on the host to be able to write to a `hostPath` volume. Even in the first case, a pod may or may not be able to use a `hostPath` volume, depending on the types of volumes usable in the pod, which are controlled by `PodSecurityPolicy`. 
+
+In Kubernetes 1.5 and newer, one can use `PodSecurityPolicy` to control access to privileged containers based on user role and groups. To enable `hostPath` volume using a `PodSecurityPolicy`, a user needs to create a new or use an existing `PodSecurityPolicy` that has `hostPath` listed in the `.spec.volumes` field as this [example](https://github.com/kubernetes/examples/blob/master/staging/podsecuritypolicy/rbac/README.md#creating-the-policies-roles-and-bindings) shows.
+
+Then the user needs to create a `Role` (or a `ClusterRole` if necessary) that is allowed to `use` the `PodSecurityPolicy`. Finally, the user needs a `RoleBinding` (or `ClusterRoleBinding` in case of a `ClusterRole`) to grant the `Role` (or `ClusterRole`) to the service account used by the shuffle service pods. For more details on how to use `PodSecurityPolicy` and RBAC to control access to `PodSecurityPolicy`, please refer to this [doc](https://github.com/kubernetes/examples/blob/master/staging/podsecuritypolicy/rbac/README.md).
+
+To specify a custom service account for the shuffle service pods, add the following to the pod template in the shuffle service `DaemonSet` defined in `conf/kubernetes-shuffle-service.yaml`:
+
+```
+spec:
+  serviceAccountName: <service account name>
+```
 
 ### Securing the Resource Staging Server with TLS
 
