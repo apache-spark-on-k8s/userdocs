@@ -55,11 +55,11 @@ If you wish to use pre-built docker images, you may use the images published in
 </tr>
 <tr>
   <td>PySpark Driver Image</td>
-  <td><code>kubespark/driver-py:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-driver-py:v2.2.0-kubernetes-0.4.0</code></td>
 </tr>
 <tr>
   <td>PySpark Executor Image</td>
-  <td><code>kubespark/executor-py:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-executor-py:v2.2.0-kubernetes-0.4.0</code></td>
 </tr>
 </table>
 
@@ -142,8 +142,8 @@ Here is how you would execute a Spark-Pi example:
       --kubernetes-namespace <k8s-namespace> \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/driver-py:v2.2.0-kubernetes-0.4.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/executor-py:v2.2.0-kubernetes-0.4.0 \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver-py:v2.2.0-kubernetes-0.4.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor-py:v2.2.0-kubernetes-0.4.0 \
       --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar \
       local:///opt/spark/examples/src/main/python/pi.py 10
 
@@ -156,15 +156,15 @@ We support this as well, as seen with the following example:
       --kubernetes-namespace <k8s-namespace> \
       --conf spark.executor.instances=5 \
       --conf spark.app.name=spark-pi \
-      --conf spark.kubernetes.driver.docker.image=kubespark/driver-py:v2.2.0-kubernetes-0.4.0 \
-      --conf spark.kubernetes.executor.docker.image=kubespark/executor-py:v2.2.0-kubernetes-0.4.0 \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver-py:v2.2.0-kubernetes-0.4.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor-py:v2.2.0-kubernetes-0.4.0 \
       --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar \
       --py-files local:///opt/spark/examples/src/main/python/sort.py \
       local:///opt/spark/examples/src/main/python/pi.py 10
 
       
 You may also customize your Docker images to use different `pip` packages that suit your use-case. As you can see
-with the current `driver-py` Docker image we have commented out the current pip module support that you can uncomment
+with the current `spark-driver-py` Docker image we have commented out the current pip module support that you can uncomment
 to use:
 
     ...
