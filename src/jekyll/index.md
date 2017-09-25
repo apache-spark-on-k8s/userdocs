@@ -18,6 +18,12 @@ This is a collaboratively maintained project working on
 The goal is to bring native support for Spark to use Kubernetes as a cluster manager, 
 in a fully supported way on par with the Spark Standalone, Mesos, and Apache YARN cluster managers.
 
+### Relation with apache/spark
+
+This project was put up for voting in [an SPIP](http://apache-spark-developers-list.1001551.n3.nabble.com/SPIP-Spark-on-Kubernetes-td22147.html)
+in August 2017 and passed. It is in the process of being
+upstreamed into the apache/spark repository.
+
 
 ### Contents
 
