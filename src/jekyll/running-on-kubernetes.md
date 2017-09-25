@@ -237,9 +237,8 @@ Note that this resource staging server is only required for submitting local dep
 dependencies are all hosted in remote locations like HDFS or http servers, they may be referred to by their appropriate
 remote URIs. Also, application dependencies can be pre-mounted into custom-built Docker images. Those dependencies
 can be added to the classpath by referencing them with `local://` URIs and/or setting the `SPARK_EXTRA_CLASSPATH`
-environment variable in your Dockerfiles. For any remote dependencies that aren't baked into the driver and executor
-docker images, whether they are supplied via http, or hdfs, or the resource staging server,  the
-init-container (`spark.kubernetes.initcontainer.docker.image`) must be specified during submission.
+environment variable in your Dockerfiles. For any remote dependencies (not using the local:// scheme),
+the init-container (`spark.kubernetes.initcontainer.docker.image`) must be specified during submission.
 
 ### Accessing Kubernetes Clusters
 
