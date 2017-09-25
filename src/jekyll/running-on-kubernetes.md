@@ -614,37 +614,39 @@ from the other deployment modes. See the [configuration page](configuration.html
   </td>
 </tr>
 <tr>
-  <td><code>spark.kubernetes.driver.labels</code></td>
+  <td><code>spark.kubernetes.driver.label.[LabelName]</code></td>
   <td>(none)</td>
   <td>
-    Custom labels that will be added to the driver pod. This should be a comma-separated list of label key-value pairs,
-    where each label is in the format <code>key=value</code>. Note that Spark also adds its own labels to the driver pod
+    Add the label specified by <code>LabelName</code> to the driver pod.
+    For example, <code>spark.kubernetes.driver.label.something=true</code>.
+    Note that Spark also adds its own labels to the driver pod
     for bookkeeping purposes.
   </td>
 </tr>
 <tr>
-  <td><code>spark.kubernetes.driver.annotations</code></td>
+  <td><code>spark.kubernetes.driver.annotation.[AnnotationName]</code></td>
   <td>(none)</td>
   <td>
-    Custom annotations that will be added to the driver pod. This should be a comma-separated list of label key-value
-    pairs, where each annotation is in the format <code>key=value</code>.
+    Add the annotation specified by <code>AnnotationName</code> to the driver pod.
+    For example, <code>spark.kubernetes.driver.annotation.something=true</code>.
   </td>
 </tr>
 <tr>
-  <td><code>spark.kubernetes.executor.labels</code></td>
+  <td><code>spark.kubernetes.executor.label.[LabelName]</code></td>
   <td>(none)</td>
   <td>
-    Custom labels that will be added to the executor pods. This should be a comma-separated list of label key-value
-    pairs, where each label is in the format <code>key=value</code>. Note that Spark also adds its own labels to the
-    executor pods for bookkeeping purposes.
+    Add the label specified by <code>LabelName</code> to the executor pods.
+    For example, <code>spark.kubernetes.executor.label.something=true</code>.
+    Note that Spark also adds its own labels to the driver pod
+    for bookkeeping purposes.
   </td>
 </tr>
 <tr>
-  <td><code>spark.kubernetes.executor.annotations</code></td>
+  <td><code>spark.kubernetes.executor.annotation.[AnnotationName]</code></td>
   <td>(none)</td>
   <td>
-    Custom annotations that will be added to the executor pods. This should be a comma-separated list of annotation
-    key-value pairs, where each annotation is in the format <code>key=value</code>.
+    Add the annotation specified by <code>AnnotationName</code> to the executor pods.
+    For example, <code>spark.kubernetes.executor.annotation.something=true</code>.
   </td>
 </tr>
 <tr>
