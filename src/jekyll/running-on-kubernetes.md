@@ -17,8 +17,8 @@ cluster, you may setup a test cluster on your local machine using
 * You must have appropriate permissions to create and list [pods](https://kubernetes.io/docs/user-guide/pods/),
 [ConfigMaps](https://kubernetes.io/docs/tasks/configure-pod-container/configmap/) and
 [secrets](https://kubernetes.io/docs/concepts/configuration/secret/) in your cluster. You can verify that
-you can list these resources by running `kubectl get pods` `kubectl get configmaps`, and `kubectl get secrets` which
-should give you a list of pods and configmaps (if any) respectively.
+you can create these resources by running `kubectl can-i create pods`, `kubectl can-i create configmap`, and `kubectl can-i create secrets` which
+should give you a response `yes` otherwise you can't create these resources. To test if you can list these resources repeat the commands with `list` instead of `create` e.q. `kubectl can-i list pods`.
 * You must have a spark distribution with Kubernetes support. The following documentation
 corresponds to v2.2.0-kubernetes-0.4.0.
 
