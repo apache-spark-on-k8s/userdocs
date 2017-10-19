@@ -14,6 +14,8 @@ cluster, you may setup a test cluster on your local machine using
 [minikube](https://kubernetes.io/docs/getting-started-guides/minikube/).
   * We recommend that minikube be updated to the most recent version (0.19.0 at the time of this documentation), as some
   earlier versions may not start up the kubernetes cluster with all the necessary components.
+* The minimum version of Kubernetes currently supported is 1.6. So your Kubernetes cluster must be running Kubernetes 1.6 and up.
+* You must have the [`kube-dns` cluster add-on](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/) available in your Kubernetes cluster. You can verify that the `kube-dns` service is up by running command `kubectl get svc --namespace=kube-system`.
 * You must have appropriate permissions to create and list [pods](https://kubernetes.io/docs/user-guide/pods/),
 [ConfigMaps](https://kubernetes.io/docs/tasks/configure-pod-container/configmap/) and
 [secrets](https://kubernetes.io/docs/concepts/configuration/secret/) in your cluster. You can verify that
