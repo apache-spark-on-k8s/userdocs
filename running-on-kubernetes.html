@@ -72,6 +72,8 @@ cluster, you may setup a test cluster on your local machine using
 earlier versions may not start up the kubernetes cluster with all the necessary components.</li>
     </ul>
   </li>
+  <li>The minimum version of Kubernetes currently supported is 1.6. So your Kubernetes cluster must be running Kubernetes 1.6 and up.</li>
+  <li>You must have the <a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/"><code>kube-dns</code> cluster add-on</a> available in your Kubernetes cluster. You can verify that the <code>kube-dns</code> service is up by running command <code>kubectl get svc --namespace=kube-system</code>.</li>
   <li>You must have appropriate permissions to create and list <a href="https://kubernetes.io/docs/user-guide/pods/">pods</a>,
 <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configmap/">ConfigMaps</a> and
 <a href="https://kubernetes.io/docs/concepts/configuration/secret/">secrets</a> in your cluster. You can verify that
@@ -360,8 +362,8 @@ the command may then look like the following:</p>
   --master k8s://&lt;k8s-master&gt;:&lt;port&gt; \
   --kubernetes-namespace default \
   --conf spark.app.name=group-by-test \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:latest \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:latest \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.4.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.4.0 \
   --conf spark.dynamicAllocation.enabled=true \
   --conf spark.shuffle.service.enabled=true \
   --conf spark.kubernetes.shuffle.namespace=default \
