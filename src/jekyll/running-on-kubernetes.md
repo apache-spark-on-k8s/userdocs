@@ -292,8 +292,8 @@ the command may then look like the following:
       --master k8s://<k8s-master>:<port> \
       --kubernetes-namespace default \
       --conf spark.app.name=group-by-test \
-      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:latest \
-      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:latest \
+      --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.4.0 \
+      --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.4.0 \
       --conf spark.dynamicAllocation.enabled=true \
       --conf spark.shuffle.service.enabled=true \
       --conf spark.kubernetes.shuffle.namespace=default \
