@@ -80,7 +80,7 @@ earlier versions may not start up the kubernetes cluster with all the necessary 
 you can list these resources by running <code>kubectl get pods</code> <code>kubectl get configmaps</code>, and <code>kubectl get secrets</code> which
 should give you a list of pods and configmaps (if any) respectively.</li>
   <li>You must have a spark distribution with Kubernetes support. The following documentation
-corresponds to v2.2.0-kubernetes-0.4.0.</li>
+corresponds to v2.2.0-kubernetes-0.5.0.</li>
 </ul>
 
 <p>This may be obtained from the
@@ -100,27 +100,35 @@ frequently used with Kubernetes, so Spark provides some support for working with
 <tr><th>Component</th><th>Image</th></tr>
 <tr>
   <td>Spark Driver Image</td>
-  <td><code>kubespark/spark-driver:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-driver:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 <tr>
   <td>Spark Executor Image</td>
-  <td><code>kubespark/spark-executor:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-executor:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 <tr>
   <td>Spark Initialization Image</td>
-  <td><code>kubespark/spark-init:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-init:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 <tr>
   <td>Spark Staging Server Image</td>
-  <td><code>kubespark/spark-resource-staging-server:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-resource-staging-server:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 <tr>
   <td>PySpark Driver Image</td>
-  <td><code>kubespark/spark-driver-py:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-driver-py:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 <tr>
   <td>PySpark Executor Image</td>
-  <td><code>kubespark/spark-executor-py:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-executor-py:v2.2.0-kubernetes-0.5.0</code></td>
+</tr>
+<tr>
+  <td>SparkR Driver Image</td>
+  <td><code>kubespark/spark-driver-r:v2.2.0-kubernetes-0.5.0</code></td>
+</tr>
+<tr>
+  <td>SparkR Executor Image</td>
+  <td><code>kubespark/spark-executor-r:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 </table>
 
@@ -133,11 +141,11 @@ like the Resource Staging Server and Spark External Shuffle Service.</p>
 <tr><th>Component</th><th>Image</th></tr>
 <tr>
   <td>Spark Resource Staging Server</td>
-  <td><code>kubespark/spark-resource-staging-server:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-resource-staging-server:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 <tr>
   <td>Spark External Shuffle Service</td>
-  <td><code>kubespark/spark-shuffle:v2.2.0-kubernetes-0.4.0</code></td>
+  <td><code>kubespark/spark-shuffle:v2.2.0-kubernetes-0.5.0</code></td>
 </tr>
 </table>
 
@@ -165,9 +173,9 @@ are set up as described above:</p>
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.4.0 \
-  local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.5.0 \
+  local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar
 </code></pre>
 
 <p>The Spark master, specified either via passing the <code>--master</code> command line argument to <code>spark-submit</code> or by setting
@@ -206,9 +214,9 @@ Here is how you would execute a Spark-Pi example:</p>
   --kubernetes-namespace &lt;k8s-namespace&gt; \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver-py:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor-py:v2.2.0-kubernetes-0.4.0 \
-  --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver-py:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor-py:v2.2.0-kubernetes-0.5.0 \
+  --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar \
   local:///opt/spark/examples/src/main/python/pi.py 10
 </code></pre>
 
@@ -221,9 +229,9 @@ We support this as well, as seen with the following example:</p>
   --kubernetes-namespace &lt;k8s-namespace&gt; \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver-py:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor-py:v2.2.0-kubernetes-0.4.0 \
-  --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver-py:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor-py:v2.2.0-kubernetes-0.5.0 \
+  --jars local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar \
   --py-files local:///opt/spark/examples/src/main/python/sort.py \
   local:///opt/spark/examples/src/main/python/pi.py 10
 </code></pre>
@@ -284,11 +292,11 @@ YAML file requires you to have permissions to create Deployments, Services, and 
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.2.0-kubernetes-0.4.0 \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.2.0-kubernetes-0.5.0 \
   --conf spark.kubernetes.resourceStagingServer.uri=http://&lt;address-of-any-cluster-node&gt;:31000 \
-  ./examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar
+  ./examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar
 </code></pre>
 
 <p>The Docker image for the resource staging server may also be built from source, in a similar manner to the driver
@@ -328,9 +336,9 @@ authenticating proxy to communicate with the api server directly without passing
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.4.0 \
-  local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.5.0 \
+  local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar
 </code></pre>
 
 <p>Communication between Spark and Kubernetes clusters is performed using the fabric8 kubernetes-client library.
@@ -368,7 +376,7 @@ the command may then look like the following:</p>
   --conf spark.shuffle.service.enabled=true \
   --conf spark.kubernetes.shuffle.namespace=default \
   --conf spark.kubernetes.shuffle.labels="app=spark-shuffle-service,spark-version=2.2.0" \
-  local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar 10 400000 2
+  local:///opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar 10 400000 2
 </code></pre>
 
 <h2 id="advanced">Advanced</h2>
@@ -492,13 +500,13 @@ communicate with the resource staging server over TLS. The trustStore can be set
   --kubernetes-namespace default \
   --conf spark.executor.instances=5 \
   --conf spark.app.name=spark-pi \
-  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.4.0 \
-  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.2.0-kubernetes-0.4.0 \
+  --conf spark.kubernetes.driver.docker.image=kubespark/spark-driver:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.executor.docker.image=kubespark/spark-executor:v2.2.0-kubernetes-0.5.0 \
+  --conf spark.kubernetes.initcontainer.docker.image=kubespark/spark-init:v2.2.0-kubernetes-0.5.0 \
   --conf spark.kubernetes.resourceStagingServer.uri=https://&lt;address-of-any-cluster-node&gt;:31000 \
   --conf spark.ssl.kubernetes.resourceStagingServer.enabled=true \
   --conf spark.ssl.kubernetes.resourceStagingServer.clientCertPem=/home/myuser/cert.pem \
-  examples/jars/spark-examples_2.11-2.2.0-k8s-0.4.0.jar
+  examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar
 </code></pre>
 
 <h3 id="spark-properties">Spark Properties</h3>
