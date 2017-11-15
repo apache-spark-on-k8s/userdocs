@@ -5,7 +5,7 @@ title: Apache Zeppelin running with Spark on Kubernetes
 description: User Documentation for Apache Zeppelin running with Spark on Kubernetes
 ---
 
-This page a ongoing effort to describe how to run Apache Zeppelin zith Spark on Kubernetes
+This page a ongoing effort to describe how to run Apache Zeppelin with Spark on Kubernetes
 
 > At the time being, the needed code is not integrated in the `master` branches of `apache-zeppelin` nor the `apache-spark-on-k8s/spark` repositories.
 > You are welcome to already ty it out and send any feedback and question.
