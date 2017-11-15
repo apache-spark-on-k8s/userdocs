@@ -24,9 +24,9 @@ This project was put up for voting in [an SPIP](http://apache-spark-developers-l
 in August 2017 and passed. It is in the process of being
 upstreamed into the apache/spark repository.
 
-
 ### Contents
 
 * [Running Spark on Kubernetes](./running-on-kubernetes.html)
 * [Running Spark in Cloud Environments](./running-on-kubernetes-cloud.html)
+* [Running Zeppelin with Spark on Kubernetes](./zeppelin.html)
 * [Contribute](./contribute.html)
