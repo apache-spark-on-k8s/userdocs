@@ -1,6 +1,6 @@
 highlighter: pygments
 markdown: kramdown
-plugins:
+plugins_dir:
   - jekyll-redirect-from
   - jekyll-toc
   - jekyll-watch
