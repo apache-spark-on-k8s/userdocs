@@ -77,8 +77,8 @@ earlier versions may not start up the kubernetes cluster with all the necessary 
   <li>You must have appropriate permissions to create and list <a href="https://kubernetes.io/docs/user-guide/pods/">pods</a>,
 <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configmap/">ConfigMaps</a> and
 <a href="https://kubernetes.io/docs/concepts/configuration/secret/">secrets</a> in your cluster. You can verify that
-you can list these resources by running <code>kubectl get pods</code> <code>kubectl get configmaps</code>, and <code>kubectl get secrets</code> which
-should give you a list of pods and configmaps (if any) respectively.</li>
+you can create these resources by running <code>kubectl auth can-i create pods</code>, <code>kubectl auth can-i create configmap</code>, and <code>kubectl auth can-i create secrets</code> which
+should give you a response <code>yes</code> otherwise you can&#8217;t create these resources. To test if you can list these resources repeat the commands with <code>list</code> instead of <code>create</code> e.q. <code>kubectl auth can-i list pods</code>.</li>
   <li>You must have a spark distribution with Kubernetes support. The following documentation
 corresponds to v2.2.0-kubernetes-0.5.0.</li>
 </ul>
