@@ -10,7 +10,7 @@ This page a ongoing effort to describe how to run Apache Zeppelin with Spark on 
 > At the time being, the needed code is not integrated in the `master` branches of `apache-zeppelin` nor the `apache-spark-on-k8s/spark` repositories.
 > You are welcome to already ty it out and send any feedback and question.
 
-Firs things firs, you have to choose the following modes in which you will run Zeppelin with Spark on Kubernetes:
+First things first, you have to choose the following modes in which you will run Zeppelin with Spark on Kubernetes:
 
 + The `Kubernetes modes`: Can be `in-cluster` (within a Pod) or `out-cluster` (from outside the Kubernetes cluster).
 + The `Spark deployment modes`: Can be `client` or `cluster`.
@@ -23,14 +23,14 @@ Only three combinations of these options are supported:
 
 For now, to be able to test these combinations, you need to build specific branches (see hereafter) or to use third-party Helm charts or Docker images. The needed branches and related PR are listed here:
 
-1. Spark-k8s driven branch: In-cluster client mode [see pull request #456](https://github.com/apache-spark-on-k8s/spark/pull/456)
-2. Apache Zeppeoin driven branch: Add support to run Spark interpreter on a Kubernetes cluster [see pull request #2637](https://github.com/apache/zeppelin/pull/2637)
+1. In-cluster client mode [see pull request #456](https://github.com/apache-spark-on-k8s/spark/pull/456)
+2. Add support to run Spark interpreter on a Kubernetes cluster [see pull request #2637](https://github.com/apache/zeppelin/pull/2637)
 
 ## In-Cluster with Spark-Client
 
 ![In-Cluster with Spark-Client](/img/zeppelin_in-cluster_spark-client.png "In-Cluster with Spark-Client")
 
-Build a new Zepplin  based on [#456 In-cluster client mode](https://github.com/apache-spark-on-k8s/spark/pull/456).
+Build a new Zeppelin based on [#456 In-cluster client mode](https://github.com/apache-spark-on-k8s/spark/pull/456).
 
 Once done, deploy that new build in a Kubernetes Pod with the following interpreter settings:
 
