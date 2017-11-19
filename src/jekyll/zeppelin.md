@@ -34,7 +34,7 @@ Build a new Zeppelin based on [#456 In-cluster client mode](https://github.com/a
 
 Once done, deploy that new build in a Kubernetes Pod with the following interpreter settings:
 
-+ `spark.app.name`: Any name you like
++ `spark.app.name`: Do not set any name, Zeppelin with pick one for you.
 + `spark.master`: k8s://https://kubernetes:443
 + `spark.submit.deployMode`: client
 + `spark.kubernetes.driver.pod.name`: The name of the pod where your Zeppelin instance is running.
@@ -48,9 +48,10 @@ Build a new Zepplin  based on [#2637 Spark interpreter on a Kubernetes](https://
 
 Once done, deploy that new build in a Kubernetes Pod with the following interpreter settings:
 
-+ `spark.app.name`: The name pf the application must begin with `zri-`
++ `spark.app.name`: Do not set any name, Zeppelin with pick one for you.
 + `spark.master`: k8s://https://kubernetes:443
 + `spark.submit.deployMode`: cluster
++ `spark.kubernetes.driver.pod.name`: Do not set this property.
 + Other spark.k8s properties you need to make your spark working (see [Running Spark on Kubernetes](./running-on-kubernetes.html)) such as `spark.kubernetes.initcontainer.docker.image`, `spark.kubernetes.driver.docker.image`, `spark.kubernetes.executor.docker.image`...
 
 ## Out-Cluster with Spark-Cluster
@@ -61,7 +62,8 @@ Build a new Spark and their associated docker images based on [#2637 Spark inter
 
 Once done, any vanilla Apache Zeppelin deployed in a Kubernetes Pod (your can use a Helm chart for this) will work out-of-the box with the following interpreter settings:
 
-+ `spark.app.name`: The name pf the application must begin with `zri-`
++ `spark.app.name`: Do not set any name, Zeppelin with pick one for you.
 + `spark.master`: k8s://https://ip-address-of-the-kube-api:6443 (port may depend on your setup)
 + `spark.submit.deployMode`: cluster
++ `spark.kubernetes.driver.pod.name`: Do not set this property.
 + Other spark.k8s properties you need to make your spark working (see [Running Spark on Kubernetes](./running-on-kubernetes.html)) such as `spark.kubernetes.initcontainer.docker.image`, `spark.kubernetes.driver.docker.image`, `spark.kubernetes.executor.docker.image`...
