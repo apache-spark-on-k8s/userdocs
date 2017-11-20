@@ -44,7 +44,7 @@ Once done, deploy that new build in a Kubernetes Pod with the following interpre
 
 ![In-Cluster with Spark-Cluster](/img/zeppelin_in-cluster_spark-cluster.png "In-Cluster with Spark-Cluster")
 
-Build a new Zepplin  based on [#2637 Spark interpreter on a Kubernetes](https://github.com/apache/zeppelin/pull/2637).
+Build a new Zeppelin Docker image based on [#2637 Spark interpreter on a Kubernetes](https://github.com/apache/zeppelin/pull/2637).
 
 Once done, deploy that new build in a Kubernetes Pod with the following interpreter settings:
 
@@ -67,3 +67,9 @@ Once done, any vanilla Apache Zeppelin deployed in a Kubernetes Pod (your can us
 + `spark.submit.deployMode`: cluster
 + `spark.kubernetes.driver.pod.name`: Do not set this property.
 + Other spark.k8s properties you need to make your spark working (see [Running Spark on Kubernetes](./running-on-kubernetes.html)) such as `spark.kubernetes.initcontainer.docker.image`, `spark.kubernetes.driver.docker.image`, `spark.kubernetes.executor.docker.image`...
+
+## How to test
+
+For now, you will have to build custom Spark or Zeppelin Docker images to suit your needs.
+
+[Helm Charts for Zeppelin](https://github.com/kubernetes/charts/blob/master/stable/spark/templates/spark-zeppelin-deployment.yaml) are available to deploy on your Kubernetes cluster.
