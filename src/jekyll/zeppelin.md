@@ -6,7 +6,7 @@ description: User Documentation for Apache Zeppelin running with Spark on Kubern
 tag: experimental
 ---
 
-**Apache Zeppelin with Spark on Kubernetes is experimental**
+**Apache Zeppelin with Spark on Kubernetes is `experimental`**
 
 > At the time being, the needed code is not integrated in the `master` branches of `apache-zeppelin` nor the `apache-spark-on-k8s/spark` repositories.
 > You are welcome to already ty it out and send any feedback and question.
@@ -57,7 +57,7 @@ Once done, deploy that new build in a Kubernetes Pod with the following interpre
 
 ## Out-Cluster with Spark-Cluster
 
-![Out-Cluster with Spark-Client](/img/zeppelin_out-cluster_spark-cluster.png "Out-Cluster with Spark-Client")
+![Out-Cluster with Spark-Cluster](/img/zeppelin_out-cluster_spark-cluster.png "Out-Cluster with Spark-Cluster")
 
 Build a new Spark and their associated docker images based on [#2637 Spark interpreter on a Kubernetes](https://github.com/apache/zeppelin/pull/2637).
 
