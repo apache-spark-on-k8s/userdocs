@@ -1,6 +1,6 @@
 # [WIP] Spark Job Submission on K8s 
 
-**DISCLAIMER**: The state of this documents is pre-alpha and [WIP] (Work in Progress). It contains some [TDV] (To Be Validated) and [TBC] (To Be Checked) and is not intended to be merged in the Spark documentation as it is.
+**DISCLAIMER**: The state of this documents is pre-alpha and [WIP] (Work in Progress). It contains some [TBC] (To Be Checked) and is not intended to be merged in the Spark documentation as it is.
 
 The goal of this document is to review the current submission process in `cluster mode` and introduce a way to also fully support the `client mode` thtat is mandatory for the exploraty projects (notebooks...). We want to ensure that the way the Spark `Driver` and `Executors` lifecycle is correctly understood to take correct decisions to let evolve the architecture. The `Shuffle Service` and `Resource Staging Server` are not impacted by the previous considerations, so we don't cover them.
 
@@ -15,10 +15,10 @@ We assume you have previous knowledge and experience with Spark, Kubernetes and 
 
 ## Definitions
 
-Spark support 2 types of `deploy modes`.
+Spark support 2 types of `deploy mode`.
 
 1. `client-mode`: The Spark client mode submission where the given class is directly run.
-2. `cluster-mode`: The Spark cluster mode submission creates first a `Client` (the Submission Client) object which is responsible to create an external Driver process that will in its turn run the given class.
+2. `cluster-mode`: The Spark cluster mode submission creates first a `Client` object (the Submission Client) which is responsible to create an external Driver process that will in its turn run the given class.
 
 Spark proposes 2 ways of interacting.
 
@@ -30,7 +30,7 @@ On Kubernetes side, the process can be created at 2 different places.
 1. `in-cluster`: This will always be the case the Executors.
 2. `out-cluster`: In some case, the Submission Client or the Driver can 
 
-For now, the resource managers can be `Kubernetes`, `YARN` or `Mesos`. We focuss on Kubernetes and compare to YARN as the most widely used on the market. The user gives a `master url` to choose and specify which resource manager should be used.
+For now, the resource managers can be `Kubernetes`, `YARN` or `Mesos`. We focuss on Kubernetes and compare to YARN as the most widely used on the market. The user gives a `master-url` to choose and specify which resource manager should be used.
 
 We have 6 different scenarii to consider.
 
@@ -91,7 +91,7 @@ Most important here, The invoked method depends on the deploy mode. This is desc
 
 ### Cluster Mode
 
-In case of `cluster-mode`, the method to run will be the chosen resource manager Submission Client. In case of Kubernetes, it will be `org.apache.spark.deploy.k8s.submit.Client.main`
+For `cluster-mode`, the method to run will be the chosen resource manager Submission Client. In case of Kubernetes, it will be `org.apache.spark.deploy.k8s.submit.Client.main`
 
 The Submission Client will ensure that an Configuration Step is created and applied to configure in some way the Driver Pod and its Init Container (think to configmaps...).
 
@@ -106,7 +106,7 @@ new Client(
 }
 ```
 
-Once the Definition made, the Driver Pod is create an run the given end user class (e.g. `org.apache.spark.examples.SparkPi`). The launch scrip of the Docker driver will setup the inital classpath (we then fall in the following scenario where the end user class is run).
+Once the definitions made, the Driver Pod is created and run the given end user class (e.g. `org.apache.spark.examples.SparkPi`). The launch scrip of the Docker driver will setup the inital classpath (we then fall in the following scenario where the end user class is run).
 
 ### Client Mode
 
@@ -117,14 +117,14 @@ That method is expected to `getOrCreate` a `SparkSession` which will in its turn
 Depending on the given `master-url` (which defines the resource manager), `SparkContext.createTaskScheduler` will instanciate the ah-hoc `ClusterManager`, `TaskScheduler`. and `BackendScheduler`.
 
 ```scala
-cm = getClusterManager(masterUrl) // In our case the org.apache.spark.scheduler.cluster.k8s.KubernetesClusterManager
-val scheduler = cm.createTaskScheduler(sc, masterUrl) // In our case the org.apache.spark.scheduler.cluster.k8s.KubernetesTaskSchedulerImp
-val backend = cm.createSchedulerBackend(sc, masterUrl, scheduler) // In our case the org.apache.spark.scheduler.cluster.k8s.KubernetesClusterSchedulerBackend
+cm = getClusterManager(masterUrl) // In K8S case the org.apache.spark.scheduler.cluster.k8s.KubernetesClusterManager
+val scheduler = cm.createTaskScheduler(sc, masterUrl) // In K8S case the org.apache.spark.scheduler.cluster.k8s.KubernetesTaskSchedulerImp
+val backend = cm.createSchedulerBackend(sc, masterUrl, scheduler) // In K8S case the org.apache.spark.scheduler.cluster.k8s.KubernetesClusterSchedulerBackend
 ```
 
 We are now ready to Spark on K8S, but we still need to take care on the deploy mode (cluser or client) and place where we sit (In- or Out-Cluster).
 
-## Cluster Mode vs Client Mode
+## Client Mode
 
 In `client mode`, the Driver (the given class) runs in the same Java process and the executors will be created in K8S Pods.
 
@@ -134,15 +134,15 @@ It is important to acknowledge this as during the creation of the manager and sc
 
 In the `InCluster` case, as pre-requisite to the next steps, we ask the user to define a property `spark.kubernetes.driver.pod.name` with the value being the exact name of the Pod where he is.
 
-*[TBD] In this acceptable in first instance. We can always automatically detect this in the future - Question: How do get the Pod name where we are via the API?*
+*[TBC] In this acceptable in first instance. We can always automatically detect this in the future - Question: How do get the Pod name where we are via the API?*
 
 With the presence or not of the `/var/run/secrets/kubernetes.io/serviceaccount/token` file, we can determine if we are in a Pod or not.
 
-A first place to decide this is the `org.apache.spark.deploy.k8s.SparkKubernetesClientFactory`. We have implemented the private `createInClusterKubernetesClient` and `createOutClusterKubernetesClient methods`. The public `createKubernetesClient` is solely responsible for the external callers to determine which one of the 2 private methods to use.
+The place to decide this is the `org.apache.spark.deploy.k8s.SparkKubernetesClientFactory`. We have implemented the private `createInClusterKubernetesClient` and `createOutClusterKubernetesClient methods`. The public `createKubernetesClient` is solely responsible for the external callers to determine which one of the 2 private methods to use.
 
-However, this is not enough. We also have 4 other places where decisions must be taken. The decisions are implemented with Handlers that determine behavior depedening on the in/out cluster and client/cluster mode parameters.
+However, this is not enough. We also have 4 other places where decisions must be taken. The decisions are implemented with Handlers that determine behavior depemdening on the in/out cluster and client/cluster mode parameters.
 
-The second place is the `KubernetesClusterManager` which segregates the In from the Out cluster. For OutCluster, the given spark master URL must be used, while for the InCLuster, we use the internal https://kubernetes:433 URL.
+The second impacted place is the `KubernetesClusterManager` which segregates the In from the Out cluster. For OutCluster, the given spark master URL must be used, while for the `InCLuster`, we use the internal https://kubernetes:433 URL.
 
 ```scala
 trait ManagerSpecificHandlers {
@@ -170,7 +170,7 @@ class OutClusterHandlers extends ManagerSpecificHandlers {
 }
 ```
 
-*[TBD] Make a bit more compact that code having a common method that receives the `master-url` as paramaeter.*
+*[TBC] Make a bit more compact that code having a common method that receives the `master-url` as parameter.*
 
 The third place is the `SchedulerBackendSpecificHandlers` which segregates the OutClientModeCluster (out cluster + client mode) from the rest. For OutClientModeCluster, the driver pod as the driver pod name are null.
 
@@ -204,7 +204,7 @@ class NonOutClusterClientModeHandlers extends SchedulerBackendSpecificHandlers {
 }
 ```
 
-The fourth place is `org.apache.spark.scheduler.cluster.k8s.ExecutorPodFactoryImpl` which is also impacted during Executors creation. We are for sure in a Pod but we may not have a Driver Pod to refer to.
+The fourth place is `org.apache.spark.scheduler.cluster.k8s.ExecutorPodFactoryImpl` which is impacted during Executors creation. With Executors, we are for sure in a Pod but we may have no Driver Pod to refer to (in `cluster-mode`, we have a driver Pod to refer to).
 
 *Question What is the use of the owner reference?*
 
@@ -247,7 +247,7 @@ val executorPod = (driverPod == null) match {
 }
 ```
 
-We still have an fifth place to fix an issue...The Pod names in client mode are always `spark-exec-<id>` which gives issues in case multiple `client-mode` users on the K8S cluster or in case on non-terminated pods. This is logical as the `spark.kubernetes.executor.podNamePrefix` is not set (part of the driver orchestrator process not executed in `client-mode`).
+We still have an fifth place to fix an issue. The Pod names in client mode are always `spark-exec-<id>` which gives issues in case multiple `client-mode` users on the K8S cluster or in case on non-terminated pods. This is logical as the `spark.kubernetes.executor.podNamePrefix` is not set (part of the driver orchestrator process not executed in `client-mode`).
 
 The proposed fix is here.
 
@@ -263,9 +263,11 @@ val prefix = (executorPodNamePrefix == "spark") match {
 val name = s"$prefix-exec-$executorId"
 ```
 
+*[TBC] We want to introduce a way to normalize Pod names in case of space of special characters - This should be applied to both Driver and Executor names - @see [https://github.com/apache-spark-on-k8s/spark/issues/551](#551)*
+
 # Client Mode Caveats
 
-In `cluster-mode`, the Submission Client create the configuration orchestrator, ensuring the Pods are well configured.
+In `cluster-mode`, the Submission Client creates the configuration orchestrator, ensuring the Pods are well configured.
 
 ```scala
 val configurationStepsOrchestrator = new DriverConfigurationStepsOrchestrator(
@@ -283,54 +285,21 @@ val configurationStepsOrchestrator = new DriverConfigurationStepsOrchestrator(
 
 We don't have this phase in `client-mode` where the user class is directly run (we don't go via the Submission Client), so the Driver configuration steps are not applied.
 
-At first sight, this may sound tricky, but finally we don't have any Driver pod to configure, so we can not do much for it...
+At first sight, this may sound tricky, but finally we don't have any Driver Pod to configure, so we can not do much for it...
 
-However, we must ensure that Dependencies are downloaded and Hadoop still work fine which is the case (see the reasons in next sections), but we may be fully aware of this to avoid issues in the future caused by the lack of configuration.
+However, we must ensure that Dependencies are downloaded and Hadoop still works fine which is the case (see the reasons in next sections), but we may be fully aware of this to avoid issues in the future caused by the lack of configuration.
 
-Please note that as the Driver configuration steps are not applied, the Headless Driver is also not created.
+Please note that, as the Driver configuration steps are not applied, the Headless Driver is also not created.
 
-If we really want to apply some configuration say e.g. on the executors, one option would to hook in e.g. the `KubernetesClusterManager` or still better to use the `executorInitContainerBootstrap` to achieve the needed job (if any...).
+If we really want to apply some configuration say e.g. on the Executors, one option would to hook in e.g. the `KubernetesClusterManager` or still better to use the `executorInitContainerBootstrap` to achieve the needed job (if any...).
 
-*[TBD] This is the main point to be discussed...*
+*[TBC] This is the main point to be discussed... - As first instance, we can don't need the Driver configuration steps*
 
-*[TBD] Is this a strong reason to keep the init containers?...*
-
-```scala
-createExecutorPod
-  (ENV_MOUNTED_CLASSPATH, s"$executorJarsDownloadDir/*")) ++ executorEnvs)
-val (executorPodWithInitContainer, initBootstrappedExecutorContainer) =
-  executorInitContainerBootstrap.map { bootstrap =>
-    val podWithDetachedInitContainer = bootstrap.bootstrapInitContainerAndVolumes(
-        PodWithDetachedInitContainer(
-            withMaybeSmallFilesMountedPod,
-            new ContainerBuilder().build(),
-            withMaybeSmallFilesMountedContainer))
-    val initContainerBootstrapStep =
-      if (areAnyFilesNonContainerLocal(sparkJars ++ sparkFilesResolvedFromInitContainer)) {
-        val initContainerConfigurationStepsOrchestrator =
-          new InitContainerConfigurationStepsOrchestrator(
-            namespace,
-            kubernetesResourceNamePrefix,
-            sparkJars,
-            sparkFilesResolvedFromInitContainer,
-            jarsDownloadPath,
-            filesDownloadPath,
-            dockerImagePullPolicy,
-            allDriverLabels,
-            initContainerConfigMapName,
-            INIT_CONTAINER_CONFIG_MAP_KEY,
-            submissionSparkConf)
-        val initContainerConfigurationSteps =
-          initContainerConfigurationStepsOrchestrator.getAllConfigurationSteps()
-        Some(new InitContainerBootstrapStep(initContainerConfigurationSteps,
-          initContainerConfigMapName,
-          INIT_CONTAINER_CONFIG_MAP_KEY))
-    } else Option.empty[DriverConfigurationStep]
-```
+*[TBC]: Note on performance: At first sight, it seems the `client-mode` is a bit slower than the `cluster-mode` for actions only run on driver side - To be benchmarked...*
 
 # Hadoop
 
-We want to access HDFS from Driver and Executor in whatever condition we are.
+We want to access HDFS from Driver and Executor in whatever state we are.
 
 In `cluster-mode`, this is achived mounting an existing hadoop `configmap` in the Driver. A new confimap is created based on the given one with that code in the `DriverConfigurationStepsOrchestrator`. This is in a way needed as the driver is not created via a end-user controlled process, so the end-user can not enforce its own configmaps on the Driver pod. Spark must in a way propagate the configmaps.
 
@@ -369,27 +338,98 @@ res16: Array[String] = Array(file:///, file:///, file:///)
 
 # Dependencies
 
-For `cluster-mode`, we have the configuration orchestrator which ensures that if `--jars` or `-Dspark.jars` are defined:
+For `cluster-mode`, we have the configuration orchestrator and its Steps which ensure that when `--jars` or `-Dspark.jars` are defined (same reaseonaring applies for `--files`):
 
 + In case of local resource, the Docker image has to ship the them at the given path.
 + in case of non-local resource (hdfs, http, s3a...), the init container will request the downlod to the resource staging server and will put them in the `/var/spark-data/spark-jars` folder.
 
-Same behavior applies for `--files`.
-
-At the end, we have some mounted classpath and files directory.
+At the end, we have some mounted classpath and files directory under `/var/spark-data` folder.
 
 ```console
 SPARK_MOUNTED_CLASSPATH: /var/spark-data/spark-jars/*
 SPARK_MOUNTED_FILES_DIR: /var/spark-data/spark-files
 ```
 
-The `/var/spark-data` folders are populated on Pod creation (no need to run a Spark action). The `/opt/spark/work-dir` is populated when the Spark action are requested.
+The `/var/spark-data` folders are populated on Pod creation (no need to run a Spark action).
 
-*[TBC] Can we rely on the jars in the `/opt/spark/work-dir` just like in `client-mode` (see after)? However, there are issues with that late availability on jars (think to notebooks using the Spark `cluster-mode` with `ClassNotFoundException`)*
+If we disable the init container, the external jars will be in the Executors via the `sc.addJar` mechanism implemented by spark-core which makes jars available via `spark://...` URLs resolved via the `NettyRpc` (see also details in the `client-mode` description here after).
+
+```
+2018-01-16 04:53:33 INFO  SparkContext:54 - Added JAR http://central.maven.org/maven2/org/apache/hbase/hbase-common/1.4.0/hbase-common-1.4.0.jar at http://central.maven.org/maven2/org/apache/hbase/hbase-common/1.4.0/hbase-common-1.4.0.jar 
+with timestamp 1516078413972
+2018-01-16 04:53:33 INFO  SparkContext:54 - Added JAR /opt/spark/examples/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar at spark://test-1516078409213-driver-svc.default.svc.cluster.local:7078/jars/spark-examples_2.11-2.2.0-k8s-0.5.0.jar wit
+```
+
+However, those jars will **not** be in the Driver.
+
+*[TBC] Having a way to download jars on the driver and from any other source (not only HDFS supported protocols) makes a strong argument to keep the init containers.*
 
 In `client-mode` we don't have the driver configuration orchestrator, hence not the init-container on driver level, but because we start the process in the same JVM, we can use e.g. `spark.jars` or `spark.driver.extraClassPath` to request the driver to ship the jars to the executors. In this case, the jars will reside under the `/opt/spark/work-dir` folder. The `/var/spark-data/spark-jars` remains of course empty as not populated by any init container. Please note that only on invocation of a Spark action (not a definition), when the Executor is effectively sollicated after its creation, that the jars will appear in the `/opt/spark/work-dir` folder.
 
-*[TBV] Ensure we fully master how this `/opt/spark/work-dir` is populated - Is it coming from spark-core side? Is it from HDFS (see preliminary steps)? Is it via the `-cp` or via the `spark.driver.extraClassPath`?*
+Spark puts the jars in the current folder specified in the base Docker image which is `/opt/spark/work-dir`.
+
+```
+Step 9/10 : WORKDIR /opt/spark/work-dir
+```
+
+spark-core side will put the jars defined by `spark.jars` via the SparkContext addJar (using Utils.getUserJars).
+
+```console
+ INFO [2018-01-15 14:06:30,468] ({pool-2-thread-2} ContextHandler.java[doStart]:781) - Started o.s.j.s.ServletContextHandler@2f662c2f{/static/sql,null,AVAILABLE,@Spark}
+ INFO [2018-01-15 14:06:31,119] ({pool-2-thread-2} Logging.scala[logInfo]:54) - Registered StateStoreCoordinator endpoint
+ INFO [2018-01-15 14:06:31,123] ({pool-2-thread-2} SparkInterpreter.java[createSparkSession]:410) - Created Spark session
+ INFO [2018-01-15 14:06:41,481] ({pool-2-thread-2} Logging.scala[logInfo]:54) - Added JAR /opt/spitfire/local-repo/2CBEJNFR7/hadoop-aws-2.9.0-palantir.4.jar at spark://192.168.189.239:42823/jars/hadoop-aws-2.9.0-palantir.4.jar with timestamp 1516025201481
+ INFO [2018-01-15 14:06:41,482] ({pool-2-thread-2} SparkInterpreter.java[open]:917) - sc.addJar(/opt/spitfire/local-repo/2CBEJNFR7/hadoop-aws-2.9.0-palantir.4.jar)
+ INFO [2018-01-15 14:06:41,483] ({pool-2-thread-2} Logging.scala[logInfo]:54) - Added JAR /opt/spitfire/local-repo/2CBEJNFR7/aws-java-sdk-bundle-1.11.201.jar at spark://192.168.189.239:42823/jars/aws-java-sdk-bundle-1.11.201.jar with timestamp 1516025201483
+ INFO [2018-01-15 14:06:41,485] ({pool-2-thread-2} SparkInterpreter.java[open]:917) - sc.addJar(/opt/spitfire/local-repo/2CBEJNFR7/aws-java-sdk-bundle-1.11.201.jar)
+ INFO [2018-01-15 14:06:41,493] ({pool-2-thread-2} SparkInterpreter.java[populateSparkWebUrl]:980) - Sending metadata to Zeppelin server: {message=Spark UI enabled, url=http://192.168.189.239:4040}
+ INFO [2018-01-15 14:06:51,465] ({pool-2-thread-2} Logging.scala[logInfo]:54) - Parsing command: bank
+ INFO [2018-01-15 14:06:52,011] ({pool-2-thread-2} SchedulerFactory.java[jobFinished]:115) - Job 20180115-140548_1964460 finished by scheduler org.apache.zeppelin.spark.SparkInterpreter1659571498
+```
+
+```scala
+...
+   _jars = Utils.getUserJars(_conf)
+...
+    // Add each JAR given through the constructor
+    if (jars != null) {
+      jars.foreach(addJar)
+    }
+...
+// SparkContext
+  /**
+   * Adds a JAR dependency for all tasks to be executed on this `SparkContext` in the future.
+   * @param path can be either a local file, a file in HDFS (or other Hadoop-supported filesystems),
+   * an HTTP, HTTPS or FTP URI, or local:/path for a file on every worker node.
+   */
+  def addJar(path: String) {
+...
+      val timestamp = System.currentTimeMillis
+      if (addedJars.putIfAbsent(key, timestamp).isEmpty) {
+        logInfo(s"Added JAR $path at $key with timestamp $timestamp")
+        postEnvironmentUpdate()
+      }
+```
+
+```scala
+// Utils
+  /**
+   * In YARN mode this method returns a union of the jar files pointed by "spark.jars" and the
+   * "spark.yarn.dist.jars" properties, while in other modes it returns the jar files pointed by
+   * only the "spark.jars" property.
+   */
+  def getUserJars(conf: SparkConf, isShell: Boolean = false): Seq[String] = {
+    val sparkJars = conf.getOption("spark.jars")
+    if (conf.get("spark.master") == "yarn" && isShell) {
+      val yarnJars = conf.getOption("spark.yarn.dist.jars")
+      unionFileLists(sparkJars, yarnJars).toSeq
+    } else {
+      sparkJars.map(_.split(",")).map(_.filter(_.nonEmpty)).toSeq.flatten
+    }
+  }
+```
+
+*[TBC] Explain why the jars are available in the Driver for `cient-mode`*
 
 # YARN Dependencies
 
@@ -492,7 +532,7 @@ In case of spark-submit (client or cluster mode), the process is the same and ge
 -rw-r--r--   1 datalayer supergroup    1991211 2018-01-13 18:13 /user/datalayer/.sparkStaging/application_1515858696776_0016/spark-examples_2.11-2.2.0-k8s-0.5.0.jar
 ```
 
-PS: 2018-01-13 12:15:27 WARN  SparkConf:66 - In Spark 1.0 and later spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone and LOCAL_DIRS in YARN).
+*[TBC] Explaine this log: 2018-01-13 12:15:27 WARN  SparkConf:66 - In Spark 1.0 and later spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone and LOCAL_DIRS in YARN).*
 
 # Notes
 
@@ -508,10 +548,6 @@ K8S reource manager delegates to the init container the download of the jars and
 + Spark susbmission not connected on HDFS: ...
 + Other distribution cache: ...
 + Hadoop conf dir: Hadoop conf must not be present before hand on nodes and can be mounted from configmaps.
-
-### org.apache.spark.deploy.k8s.submit.Client
-
-Is the org.apache.spark.deploy.k8s.submit.Client still used? It seems not...
 
 ### Submit in client mode from a client with restricted network access
 
