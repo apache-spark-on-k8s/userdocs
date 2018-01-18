@@ -41,12 +41,16 @@ We have 6 different scenarii to consider.
 5. spark-shell client-mode in-cluster
 6. spark-shell client-mode out-cluster
 
+*Please note the spark-shell is a special of spark-submit where the class to run is `org.apache.spark.deploy.k8s.submit.Client` and is only supported in `client-mode` as it receives commands and gives results via the end-user console - We want to be sure that this `spark-shell` end-user command is fully operational, this is why we identify those last 2 cases*
+
 The support functions we want to cover are.
 
 + Full support of Spark stack (core, sql, ml, streamin...)
 + Ability to make external jars and files available in Driver and Executors.
 + Access to secured Hadoop from Driver and Executor.
 + Ability to hook to mount and configure other behavior (think to connecting to an Etcd cluster).
+
+We don't consider or test here the Python and R behavior (only pure Scala is considered).
 
 We want to achieve these with the minimal impact on the non-kubernetes Spark modules.
 
